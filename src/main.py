@@ -7,7 +7,6 @@ import json
 from pyquery import PyQuery as pq
 import uuid
 import time
-import remove
 import cv2
 
 def parse_input():
@@ -53,6 +52,7 @@ def crop_watermark(img_path):
     cv2.imwrite("./adjusted/test.jpg", cropped)
 
 if __name__ == '__main__':
+    # python ./src/main.py -n 279938742
     # 0) set constants
     picture_path = 'pictures'
     if not os.path.exists(picture_path):
