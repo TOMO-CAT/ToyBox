@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1" />
+    <meta name="google-site-verification" content="FTeR0c8arOPKh8c5DYh_9uu98_zJbaWw53J-Sch9MTg" />
+    <link rel="shortcut icon" type="image/x-icon" href="https://static.zhihu.com/static/favicon.ico" />
+    <style>
+      body {
+        margin: 0;
+        font-family: 'Helvetica Neue', Helvetica, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', Arial, sans-serif;
+        font-size: 15px;
+        color: #404040;
+      }
+
+      .Header {
+        overflow: hidden;
+        background-color: #fff;
+        box-shadow: 0 3px 4px rgba(0, 0, 0, 0.06);
+      }
+
+      .Header-inner {
+        width: 1008px;
+        margin: 0 auto;
+        padding: 0 16px;
+      }
+
+      .Header-logo {
+        width: 64px;
+        height: 30px;
+        margin: 15px 0;
+      }
+
+      .Header-logo img {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .Compatibility {
+        width: 1008px;
+        margin: 0 auto;
+        padding: 16px;
+      }
+
+      .Compatibility-icon {
+        width: 112px;
+        height: 83px;
+        margin: 64px auto;
+      }
+
+      .Compatibility-icon img {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+
+      .Compatibility-tip {
+        font-size: 24px;
+        @mixin bold;
+        text-align: center;
+      }
+
+      .CompatibilityBrowsers {
+        overflow: hidden;
+        margin-top: 64px;
+      }
+
+      .CompatibilityBrowsers-item {
+        position: relative;
+        float: left;
+        width: 50%;
+        padding: 16px 0;
+      }
+
+      a.CompatibilityBrowsers-item {
+        text-decoration: none;
+        color: #3e7ac2;
+      }
+
+      .CompatibilityBrowsers-divider {
+        position: absolute;
+        right: 0;
+        top: 24px;
+        height: 64px;
+        border-right: 1px solid #ebeef5;
+      }
+
+      .CompatibilityBrowsers-icon {
+        width: 80px;
+        height: 80px;
+        margin: 0 auto;
+      }
+
+      .CompatibilityBrowsers-icon img {
+        display: block;
+      }
+
+      .CompatibilityBrowsers-ieIcon img {
+        width: 88px;
+        height: 81px;
+        margin-left: -8px;
+        margin-top: -1px;
+      }
+
+      .CompatibilityBrowsers-chromeIcon img {
+        width: 83px;
+        height: 83px;
+        margin: -1.5px;
+      }
+
+      .CompatibilityBrowsers-text {
+        margin-top: 32px;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="Header">
+      <div class="Header-inner">
+        <div class="Header-logo">
+          <img src="/compatibility/images/logo@2x.png" srcset="/compatibility/images/logo.png 1x, /compatibility/images/logo@2x.png 2x, /compatibility/images/logo@3x.png 3x" />
+        </div>
+      </div>
+    </div>
+    <div class="Compatibility">
+      <div class="Compatibility-icon">
+        <img src="/compatibility/images/icon@2x.png" srcset="/compatibility/images/icon.png 1x, /compatibility/images/icon@2x.png 2x, /compatibility/images/icon@3x.png 3x" />
+      </div>
+      <div class="Compatibility-tip">ä½ æ­£å¨ä½¿ç¨çæµè§å¨çæ¬è¿ä½ï¼å°ä¸è½æ­£å¸¸æµè§åä½¿ç¨ç¥ä¹ã</div>
+      <div class="CompatibilityBrowsers">
+        <a href="https://www.microsoft.com/zh-cn/download/internet-explorer.aspx" class="CompatibilityBrowsers-item">
+          <div class="CompatibilityBrowsers-icon CompatibilityBrowsers-ieIcon">
+            <img src="/compatibility/images/internet-explorer@2x.png" srcset="/compatibility/images/internet-explorer.png 1x, /compatibility/images/internet-explorer@2x.png 2x, /compatibility/images/internet-explorer@3x.png 3x" />
+          </div>
+          <div class="CompatibilityBrowsers-text">åçº§ IE æµè§å¨</div>
+          <div class="CompatibilityBrowsers-divider"></div>
+        </a>
+        <a href="http://www.google.com/chrome/" class="CompatibilityBrowsers-item">
+          <div class="CompatibilityBrowsers-icon CompatibilityBrowsers-chromeIcon">
+            <img src="/compatibility/images/google-chrome@2x.png" srcset="/compatibility/images/google-chrome.png 1x, /compatibility/images/google-chrome@2x.png 2x, /compatibility/images/google-chrome@3x.png 3x" />
+          </div>
+          <div class="CompatibilityBrowsers-text">ä½¿ç¨ Google Chrome æµè§å¨</div>
+        </a>
+    </div>
+  </body>
+</html>
