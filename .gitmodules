@@ -1,0 +1,3 @@
+[submodule "thirdparty/blade-build"]
+	path = thirdparty/blade-build
+	url = https://github.com/chen3feng/blade-build.git
