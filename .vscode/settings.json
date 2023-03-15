@@ -1,0 +1,130 @@
+{
+    "cSpell.words": [
+        "srcs"
+    ],
+    "cpplint.lineLength": 180, // 设置行长度
+    "cpplint.filters": [
+        "-legal/copyright",
+        "-runtime/references",
+        "-whitespace/ending_newline",
+        "-build/include_subdir",
+        "-readability/todo",
+        "-build/include_order",
+        "-build/c++11",
+        "-readability/casting",
+        "-whitespace/line_length"
+    ],
+    "files.associations": {
+        "array": "cpp",
+        "atomic": "cpp",
+        "strstream": "cpp",
+        "bit": "cpp",
+        "*.tcc": "cpp",
+        "cctype": "cpp",
+        "clocale": "cpp",
+        "cmath": "cpp",
+        "cstdarg": "cpp",
+        "cstddef": "cpp",
+        "cstdint": "cpp",
+        "cstdio": "cpp",
+        "cstdlib": "cpp",
+        "cwchar": "cpp",
+        "cwctype": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "exception": "cpp",
+        "algorithm": "cpp",
+        "functional": "cpp",
+        "iterator": "cpp",
+        "memory": "cpp",
+        "memory_resource": "cpp",
+        "numeric": "cpp",
+        "optional": "cpp",
+        "random": "cpp",
+        "string": "cpp",
+        "string_view": "cpp",
+        "system_error": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "fstream": "cpp",
+        "initializer_list": "cpp",
+        "iosfwd": "cpp",
+        "iostream": "cpp",
+        "istream": "cpp",
+        "limits": "cpp",
+        "new": "cpp",
+        "ostream": "cpp",
+        "sstream": "cpp",
+        "stdexcept": "cpp",
+        "streambuf": "cpp",
+        "cinttypes": "cpp",
+        "typeinfo": "cpp",
+        "cstring": "cpp",
+        "ctime": "cpp",
+        "iomanip": "cpp",
+        "csignal": "cpp",
+        "chrono": "cpp",
+        "condition_variable": "cpp",
+        "future": "cpp",
+        "mutex": "cpp",
+        "ratio": "cpp",
+        "thread": "cpp",
+        "bitset": "cpp",
+        "codecvt": "cpp",
+        "complex": "cpp",
+        "filesystem": "cpp",
+        "typeindex": "cpp",
+        "variant": "cpp",
+        "hash_map": "cpp",
+        "hash_set": "cpp",
+        "cfenv": "cpp",
+        "forward_list": "cpp",
+        "unordered_set": "cpp",
+        "any": "cpp",
+        "scoped_allocator": "cpp",
+        "shared_mutex": "cpp",
+        "regex": "cpp",
+        "valarray": "cpp",
+        "*.inc": "cpp",
+        // "*.cc.in": "cpp",
+    },
+    // clang-foramt bin path
+    "clang-format.executable": "/usr/bin/clang-format",
+    // format on save
+    "editor.formatOnSave": true,
+    // // 修复不生效的问题
+    // "editor.defaultFormatter": "ms-vscode.cpptools",
+    // default formatter for C++
+    "[cpp]": {
+        "editor.defaultFormatter": "mjohns.clang-format"
+    },
+    "[markdown]": {
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": true,
+        "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+    },
+    "editor.suggest.snippetsPreventQuickSuggestions": false,
+    "[proto3]": {
+        "editor.defaultFormatter": "zxh404.vscode-proto3"
+    },
+    "[jsonc]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "clang-format.fallbackStyle": "Google",
+    "[cmake]": {
+        "editor.defaultFormatter": "josetr.cmake-language-support-vscode"
+    },
+    "[json]": {
+        "editor.defaultFormatter": "vscode.json-language-features"
+    },
+    "editor.inlayHints.enabled": "off",
+    "markdownlint.ignore": [
+        ".clang-format",
+        "**/.clang-format"
+    ],
+}

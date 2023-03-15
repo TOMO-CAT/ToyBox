@@ -1,4 +1,9 @@
 cc_binary(
     name='server',
-    srcs=['server.cc'],
+    srcs=[
+        'server.cc', 'log.h'
+    ],
+    deps=[
+        '//thirdparty/coost:co',
+    ],
 )

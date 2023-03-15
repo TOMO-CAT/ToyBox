@@ -1,0 +1,27 @@
+---
+BasedOnStyle: Google
+---
+Language:                               Cpp
+Cpp11BracedListStyle:                   true
+Standard:                               Cpp11
+AllowShortFunctionsOnASingleLine:       None
+AllowShortLambdasOnASingleLine:         None
+DerivePointerAlignment:                 false
+PointerAlignment:                       Left
+CommentPragmas:                         '^ NOLINT'
+ColumnLimit:                            100
+IncludeCategories:
+  - Regex:                              '^<(.*)(\.h>)$'
+    Priority:                           1
+  - Regex:                              '^<'
+    Priority:                           2
+  - Regex:                              '^"([a-zA-Z_]*)(\.h")$'
+    Priority:                           3
+  - Regex:                              '^"(opencv2|pcl|Eigen|gtest)/'
+    Priority:                           3
+  - Regex:                              '.*'
+    Priority:                           4
+---
+Language:                               Proto
+ColumnLimit:                            100
+---
