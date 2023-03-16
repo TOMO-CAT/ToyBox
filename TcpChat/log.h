@@ -1,5 +1,7 @@
 #pragma once
 
+#include <iostream>
+
 #define LOG_ERROR(fmt, args...)                                                                \
   do {                                                                                         \
     fprintf(stderr, "[Deloger::Error][%s:%d][%s] " fmt "\n", __FILE__, __LINE__, __FUNCTION__, \
