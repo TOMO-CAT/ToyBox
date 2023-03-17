@@ -3,8 +3,23 @@
 
 #include "TcpChat/log.h"
 
-bool ListenOn(uint32_t port) {
-}
+class TcpServer {
+ public:
+  // Meyers's singleton 单例设计模式: https://zhuanlan.zhihu.com/p/476220724
+  static TcpServer& GetInstance() {
+    static TcpServer instance;
+    return instance;
+  }
+  TcpServer(const TcpServer&) = delete;
+  TcpServer& operator=(const TcpServer&) = delete;
+
+ private:
+  TcpServer() {
+  }
+
+ public:
+  int32_t server_sockfd_ = -1;
+};
 
 int main() {
   LOG_INFO("print something...");
