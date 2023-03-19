@@ -1,11 +1,7 @@
 prebuilt_cc_library(
-    name='co',
+    name='backtrace',
     export_incs=['include'],
     libpath_pattern='lib',
     hdrs=glob("./**/*.h"),
-    deps=[
-        '//thirdparty/backtrace:backtrace',
-        '#dl',
-    ],
     visibility=['PUBLIC'],
 )

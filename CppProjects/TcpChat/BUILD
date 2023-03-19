@@ -2,9 +2,9 @@ cc_binary(
     name='server',
     srcs=[
         'server.cc',
-        'log.h',
     ],
     deps=[
+        '//TcpChat/tcp_server:tcp_server',
         '//thirdparty/coost:co',
     ],
 )

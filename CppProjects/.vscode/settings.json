@@ -1,6 +1,10 @@
 {
     "cSpell.words": [
-        "srcs"
+        "epoll",
+        "EPOLLET",
+        "EPOLLIN",
+        "srcs",
+        "WLOG"
     ],
     "cpplint.lineLength": 180, // 设置行长度
     "cpplint.filters": [
