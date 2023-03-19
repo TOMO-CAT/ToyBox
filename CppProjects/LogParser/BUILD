@@ -1,0 +1,10 @@
+cc_binary(
+    name='LogParser',
+    srcs=[
+        'main.cc',
+    ],
+    deps=[
+        '//LogParser/log_parser:log_parser',
+        '//thirdparty/util:util',
+    ],
+)

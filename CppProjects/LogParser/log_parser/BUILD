@@ -1,0 +1,20 @@
+cc_library(
+    name='log_parser',
+    srcs=[
+        'convert_value.cc',
+        'float_str.cc',
+        'log_parser_mgr.cc',
+        'log_parser.cc',
+    ],
+    hdrs=[
+        'convert_value.h',
+        'float_str.h',
+        'log_parser_mgr.h',
+        'log_parser.h',
+    ],
+    deps=[
+        '//thirdparty/util:util',
+        '#pthread',
+    ],
+    visibility=['PUBLIC'],
+)

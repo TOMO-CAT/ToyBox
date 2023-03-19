@@ -13,6 +13,8 @@
 #include <string>
 #include <thread>
 
+#include "co/log.h"
+
 namespace {
 
 constexpr uint32_t kBacklog = 10;

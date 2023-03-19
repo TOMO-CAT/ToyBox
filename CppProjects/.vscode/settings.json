@@ -3,6 +3,9 @@
         "epoll",
         "EPOLLET",
         "EPOLLIN",
+        "gmock",
+        "hdrs",
+        "sptr",
         "srcs",
         "WLOG"
     ],

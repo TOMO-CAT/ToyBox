@@ -9,8 +9,6 @@
 #include <thread>
 #include <unordered_map>
 
-#include "thirdparty/coost/include/co/log.h"
-
 namespace tcp_chat {
 
 class TcpServer {

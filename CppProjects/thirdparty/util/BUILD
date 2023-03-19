@@ -1,0 +1,29 @@
+cc_library(
+    name='util',
+    srcs=[
+        'str_util.cc',
+        'threadpool.cc',
+    ],
+    hdrs=[
+        'log.h',
+        'macros.h',
+        'str_util.h',
+        'threadpool.h',
+    ],
+    deps=[
+        '//thirdparty/gtest:gtest',
+    ],
+    visibility=['PUBLIC'],
+)
+
+cc_test(
+    name='threadpool_test',
+    srcs=[
+        'threadpool_test.cc',
+    ],
+    deps=[
+        ':util',
+        '//thirdparty/gtest:gtest',
+        '#pthread',
+    ],
+)
