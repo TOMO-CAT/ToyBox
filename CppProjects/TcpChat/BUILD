@@ -8,3 +8,14 @@ cc_binary(
         '//thirdparty/coost:co',
     ],
 )
+
+cc_binary(
+    name='client',
+    srcs=[
+        'client.cc',
+    ],
+    deps=[
+        '//TcpChat/tcp_client:tcp_client',
+        '//thirdparty/coost:co',
+    ],
+)
