@@ -2,7 +2,7 @@
 FROM ubuntu:22.04
 
 # 安装依赖
-RUN apt-get update && apt-get install -y --fix-missing \
+RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list && apt-get update && apt-get install -y --fix-missing \
     build-essential \
     git \
     curl \
