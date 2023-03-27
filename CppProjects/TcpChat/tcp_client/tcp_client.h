@@ -8,7 +8,7 @@ namespace tcp_chat {
 
 class TcpClient final {
  public:
-  TcpClient();
+  TcpClient(const std::string& name);
   ~TcpClient();
 
  public:
@@ -17,9 +17,7 @@ class TcpClient final {
   void Send(const std::string& message);
 
  private:
- static void SetNonBlocking(int32_t fd);
-
- private:
+  std::string name_;
   int32_t sockfd_ = -1;
   std::atomic<bool> is_stop_ = {false};
   std::thread recv_thread_;
