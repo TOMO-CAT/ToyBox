@@ -17,6 +17,9 @@ class TcpClient final {
   void Send(const std::string& message);
 
  private:
+ static void SetNonBlocking(int32_t fd);
+
+ private:
   int32_t sockfd_ = -1;
   std::atomic<bool> is_stop_ = {false};
   std::thread recv_thread_;

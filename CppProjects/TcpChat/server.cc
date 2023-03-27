@@ -10,8 +10,7 @@ int main() {
   server.Start(port);
 
   // run for 30 minutes
-  // std::this_thread::sleep_for(std::chrono::minutes(30));
-  std::this_thread::sleep_for(std::chrono::milliseconds(2000));
+  std::this_thread::sleep_for(std::chrono::minutes(30));
   server.Stop();
 
   return 0;
