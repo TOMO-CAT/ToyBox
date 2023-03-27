@@ -1,5 +1,6 @@
 {
     "cSpell.words": [
+        "epoll",
         "srcs"
     ],
     "cpplint.lineLength": 180, // 设置行长度

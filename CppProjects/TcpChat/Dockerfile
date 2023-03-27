@@ -6,19 +6,21 @@ RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list && 
     build-essential \
     git \
     curl \
-    && curl https://raw.githubusercontent.com/baidu/blade-build/master/install.sh | sh \
+    python2.7 \
     && rm -rf /var/lib/apt/lists/*
 
 # 安装 blade
-# RUN git clone https://github.com/chen3feng/blade-build.git /blade-build
-# RUN cd /blade-build && \
-#     ./install.sh && \
-#     source ~/.profile && \
-#     cd .. && \
-#     rm -rf blade-build
+RUN git clone https://github.com/chen3feng/blade-build.git --branch v2.0 --single-branch --depth=1 /blade-build && \
+    cd /blade-build && \
+    ./install && \
+    # 单引号以纯字符串的方式写入 ~/.bashrc, 而不会被解释为变量或者命令
+    echo 'export PATH=~/bin:$PATH' >> ~/.bashrc && \
+    # cd .. && rm -rf /blade-build && \
+    bash
+
 
 # 创建一个挂载点, 用于将 TcpChat 目录映射到 docker 的 /TcpChat 目录
-VOLUME ../TcpChat/TcpChat
+# VOLUME /TcpChat
 
 # 指定工作目录
-WORKDIR /TcpChat
+# WORKDIR /TcpChat
