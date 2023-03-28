@@ -7,19 +7,21 @@ TcpServer 使用 epoll 实现并发处理多个连接请求，每个连接套接
 ## Docker
 
 ```bash
+# 进入文件夹
+cd CppProjects
+
 # 构造 docker 镜像
 bash docker_build.sh
 
-# 创建 docker 容器
+# 创建并进入 docker 容器
 bash docker_run.sh
 ```
 
 ## Build
 
-```bash
-# 进入编译文件夹
-$ cd CppProjects
+在 docker 环境中执行:
 
+```bash
 # 编译 TcpServer 和 TcpClient
 $ blade build TcpChat
 

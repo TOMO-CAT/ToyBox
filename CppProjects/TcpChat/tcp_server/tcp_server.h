@@ -50,7 +50,7 @@ class TcpServer {
   std::atomic<bool> is_stop_gracefully_ = false;
 
   struct epoll_event epoll_events_[kMaxEpollEvents];
-  std::unordered_map<int32_t, std::string> sock_fd_to_client_ip_;
+  std::unordered_map<int32_t, std::string> sock_fd_to_client_addr_;
 
   std::thread epoll_thread_;
 };

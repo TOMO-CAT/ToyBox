@@ -73,8 +73,11 @@ void TcpClient::Connect(const std::string& server_ip, uint32_t server_port) {
 
       // 数据可读
       static char buffer[kBufferSize];
-      memset(buffer, 0, sizeof(buffer));
+      memset(buffer, '\0', sizeof(buffer));
       auto nbytes = read(sockfd_, buffer, kBufferSize);
+
+      std::cout << "nbytes: " << nbytes << std::endl;
+
       if (nbytes == -1) {
         // 出错
         ELOG << "[" << name_ << "]: read() fail: " << std::strerror(errno);
@@ -85,7 +88,11 @@ void TcpClient::Connect(const std::string& server_ip, uint32_t server_port) {
         close(sockfd_);
         exit(EXIT_FAILURE);
       } else {
-        // 成功读到数据, 将收到的消息打印到标准输出
+        buffer[nbytes] = '\0';
+        // 成功读到数据, 处理 TCP 的粘包问题(即同时收到多条消息)
+        LOG << "[" << name_ << "]: receive message: " << buffer;
+
+        // 将收到的消息打印到标准输出
         std::cout << buffer << std::endl;
       }
     }
@@ -105,6 +112,7 @@ void TcpClient::Send(const std::string& message) {
   static char buffer[kBufferSize];
   memset(buffer, 0, sizeof(buffer));
   snprintf(buffer, kBufferSize, "%s", msg.c_str());
+  // std::cout << "write message: " << buffer << std::endl;
   if (write(sockfd_, buffer, strlen(buffer)) == -1) {
     ELOG << "write() fail: " << std::strerror(errno);
     exit(EXIT_FAILURE);

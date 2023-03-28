@@ -21,6 +21,7 @@ int main(int argc, char* argv[]) {
   client.Send(std::string("my name is ") + argv[1]);
   client.Send("goodbye, see you next time");
 
+  std::this_thread::sleep_for(std::chrono::seconds(2));
   client.Disconnect();
 
   return 0;

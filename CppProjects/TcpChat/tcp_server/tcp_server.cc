@@ -149,8 +149,9 @@ void TcpServer::HandleEpollEvent() {
       exit(EXIT_FAILURE);
     }
     std::string cli_ip = inet_ntoa(cli_addr.sin_addr);
-    LOG << "accept client socket from " << cli_ip << ", with fd: " << conn_fd;
-    sock_fd_to_client_ip_[conn_fd] = cli_ip;
+    std::string cli_address = cli_ip + ":" + std::to_string(ntohs(cli_addr.sin_port));
+    LOG << "accept client socket from " << cli_address << ", with fd: " << conn_fd;
+    sock_fd_to_client_addr_[conn_fd] = cli_address;
 
     // set nonblocking
     SetNonBlocking(conn_fd);
@@ -167,6 +168,8 @@ void TcpServer::HandleEpollEvent() {
 
   auto client_msg_handler = [this](int sock_fd, int fd_cnt) {
     static char buffer[kReadBufferSize];
+    memset(buffer, '\0', sizeof(buffer));
+
     int nbytes = read(sock_fd, buffer, kReadBufferSize);
     if (nbytes == -1) {
       // 出错
@@ -176,10 +179,13 @@ void TcpServer::HandleEpollEvent() {
       }
     } else if (nbytes == 0) {
       // 客户端断开链接
-      LOG << "client " << sock_fd_to_client_ip_[sock_fd] << " disconnected";
+      LOG << "client " << sock_fd_to_client_addr_[sock_fd] << " disconnected";
       close(sock_fd);
     } else {
       // 将消息转发给其他客户端
+      // TODO(cat): 是否成功发送消息?
+      LOG << "recv message from [" << sock_fd_to_client_addr_[sock_fd] << ":" << sock_fd
+          << "], message: " << buffer;
       for (int i = 0; i < fd_cnt; ++i) {
         int fd = epoll_events_[i].data.fd;
         if (fd != listen_sockfd_ && fd != sock_fd) {
