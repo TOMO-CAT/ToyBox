@@ -29,5 +29,11 @@ $ blade build TcpChat
 $ ./build64_release/TcpChat/server
 
 # 运行多个 client 端
-$ ./build64_release/TcpChat/client 
+$ ./build64_release/TcpChat/client cat
+$ ./build64_release/TcpChat/client dog
+$ ./build64_release/TcpChat/client mouse
 ```
+
+运行例子：
+
+![example](./image/tcp_chat_example.png)
