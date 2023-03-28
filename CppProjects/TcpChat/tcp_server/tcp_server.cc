@@ -10,6 +10,7 @@
 
 #include <chrono>
 #include <cstdlib>
+#include <iostream>
 #include <string>
 #include <thread>
 
@@ -180,15 +181,14 @@ void TcpServer::HandleEpollEvent() {
     } else if (nbytes == 0) {
       // 客户端断开链接
       LOG << "client " << sock_fd_to_client_addr_[sock_fd] << " disconnected";
+      sock_fd_to_client_addr_.erase(sock_fd);
       close(sock_fd);
     } else {
       // 将消息转发给其他客户端
-      // TODO(cat): 是否成功发送消息?
-      LOG << "recv message from [" << sock_fd_to_client_addr_[sock_fd] << ":" << sock_fd
-          << "], message: " << buffer;
-      for (int i = 0; i < fd_cnt; ++i) {
-        int fd = epoll_events_[i].data.fd;
-        if (fd != listen_sockfd_ && fd != sock_fd) {
+      // 因为这里只是转发, 所以我们这里不处理粘包问题, 在客户端处根据分隔符处理
+      for (auto&& iter : sock_fd_to_client_addr_) {
+        int fd = iter.first;
+        if (fd != sock_fd) {
           if (write(fd, buffer, nbytes) == -1) {
             ELOG << "write() fail: " << std::strerror(errno);
             exit(EXIT_FAILURE);

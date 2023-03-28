@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <iostream>
+#include <sstream>
 
 #include "co/log.h"
 
@@ -15,7 +16,20 @@ namespace tcp_chat {
 
 namespace {
 constexpr uint32_t kBufferSize = 1024;
+
+void Split(const std::string& msg, const char delim, std::list<std::string>* const res) {
+  res->clear();
+  std::istringstream iss(msg);
+  std::string temp;
+  while (!iss.eof()) {
+    std::getline(iss, temp, delim);
+    if (temp != "\n" && !temp.empty()) {
+      res->emplace_back(temp);
+    }
+  }
 }
+
+}  // namespace
 
 TcpClient::TcpClient(const std::string& name) : name_(name) {
 }
@@ -44,6 +58,9 @@ void TcpClient::Connect(const std::string& server_ip, uint32_t server_port) {
     close(sockfd_);
     exit(EXIT_FAILURE);
   }
+
+  std::cout << "access to the chat-room successfully!" << std::endl;
+  std::cout << "========================================================" << std::endl;
 
   recv_thread_ = std::thread([this]() {
     while (!is_stop_) {
@@ -76,8 +93,6 @@ void TcpClient::Connect(const std::string& server_ip, uint32_t server_port) {
       memset(buffer, '\0', sizeof(buffer));
       auto nbytes = read(sockfd_, buffer, kBufferSize);
 
-      std::cout << "nbytes: " << nbytes << std::endl;
-
       if (nbytes == -1) {
         // 出错
         ELOG << "[" << name_ << "]: read() fail: " << std::strerror(errno);
@@ -90,10 +105,13 @@ void TcpClient::Connect(const std::string& server_ip, uint32_t server_port) {
       } else {
         buffer[nbytes] = '\0';
         // 成功读到数据, 处理 TCP 的粘包问题(即同时收到多条消息)
-        LOG << "[" << name_ << "]: receive message: " << buffer;
-
-        // 将收到的消息打印到标准输出
-        std::cout << buffer << std::endl;
+        std::list<std::string> msg_list;
+        Split(buffer, '\n', &msg_list);
+        for (auto&& msg : msg_list) {
+          LOG << "[" << name_ << "]: receive message: " << msg;
+          // 将收到的消息打印到标准输出
+          std::cout << msg << std::endl;
+        }
       }
     }
   });
@@ -104,10 +122,12 @@ void TcpClient::Disconnect() {
   LOG << "TcpClient is going to quit, please wait";
   recv_thread_.join();
   LOG << "TcpClient quit successfully";
+  std::cout << "========================================================" << std::endl;
+  std::cout << "quit the chat-room" << std::endl;
 }
 
 void TcpClient::Send(const std::string& message) {
-  std::string msg = "[" + name_ + "]: " + message;
+  std::string msg = "[" + name_ + "]: " + message + "\n";
 
   static char buffer[kBufferSize];
   memset(buffer, 0, sizeof(buffer));
