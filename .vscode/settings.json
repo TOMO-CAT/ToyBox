@@ -6,14 +6,14 @@
     "cpplint.lineLength": 180, // 设置行长度
     "cpplint.filters": [
         "-legal/copyright",
-        "-runtime/references",
-        "-whitespace/ending_newline",
-        "-build/include_subdir",
-        "-readability/todo",
-        "-build/include_order",
+        // "-runtime/references",
+        // "-whitespace/ending_newline",
+        // "-build/include_subdir",
+        // "-readability/todo",
+        // "-build/include_order",
         "-build/c++11",
-        "-readability/casting",
-        "-whitespace/line_length"
+        // "-readability/casting",
+        // "-whitespace/line_length"
     ],
     "files.associations": {
         "array": "cpp",
