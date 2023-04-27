@@ -1,0 +1,9 @@
+cc_binary(
+    name='pistache_demo',
+    srcs=[
+        'main.cc',
+    ],
+    deps=[
+        '//thirdparty/pistache:pistache',
+    ]
+)

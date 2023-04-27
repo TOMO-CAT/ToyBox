@@ -1,11 +1,11 @@
 prebuilt_cc_library(
-    name='co',
+    name='pistache',
     export_incs=['include'],
     libpath_pattern='lib',
-    hdrs=glob("./**/*.h"),
+    hdrs=[
+        'include/pistache/endpoint.h',
+    ],
     deps=[
-        '//thirdparty/backtrace:backtrace',
-        '#dl',
     ],
     visibility=['PUBLIC'],
 )
