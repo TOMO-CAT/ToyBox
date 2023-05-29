@@ -1,10 +1,21 @@
 {
     "cSpell.words": [
+        "astype",
         "cout",
+        "dropna",
+        "echarts",
         "epoll",
+        "honghai",
+        "imshow",
         "iphdr",
+        "iterrows",
+        "jieba",
+        "pyplot",
+        "snownlp",
         "srcs",
-        "WLOG"
+        "WLOG",
+        "yaosehn",
+        "yaoshen"
     ],
     "cpplint.lineLength": 180, // 设置行长度
     "cpplint.filters": [
@@ -122,4 +133,21 @@
         ".clang-format",
         "**/.clang-format"
     ],
+    // blade
+    "python.analysis.ignore": [
+        "**/BUILD/**",
+        "**/BLADE_ROOT/**"
+    ],
+    "python.linting.flake8Args": [
+        "--ignore=F821",
+    ],
+    "cSpell.enableFiletypes": [
+        "!jsonc"
+    ],
+    "[python]": {
+        "editor.defaultFormatter": "ms-python.autopep8"
+    },
+    "python.formatting.provider": "none",
+    "python.linting.flake8Enabled": false,
+    "python.linting.enabled": true,
 }
