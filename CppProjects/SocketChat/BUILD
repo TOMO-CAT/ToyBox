@@ -20,4 +20,8 @@ cc_binary(
     srcs=[
         'nonsocket_client.cc',
     ],
+
+    deps=[
+        '#pcap',
+    ]
 )

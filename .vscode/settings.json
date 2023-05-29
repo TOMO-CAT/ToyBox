@@ -15,7 +15,12 @@
         "srcs",
         "WLOG",
         "yaosehn",
-        "yaoshen"
+        "yaoshen",
+        "cout",
+        "epoll",
+        "iphdr",
+        "srcs",
+        "WLOG"
     ],
     "cpplint.lineLength": 180, // 设置行长度
     "cpplint.filters": [
