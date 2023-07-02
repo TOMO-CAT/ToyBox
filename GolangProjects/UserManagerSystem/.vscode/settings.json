@@ -1,0 +1,40 @@
+{
+    "[markdown]": {
+        "editor.formatOnSave": true,
+        "editor.formatOnPaste": true,
+        "editor.defaultFormatter": "DavidAnson.vscode-markdownlint"
+    },
+    "markdownlint.ignore": [
+        ".clang-format",
+        "**/.clang-format"
+    ],
+    "cSpell.words": [
+        "Anson",
+        "extendee",
+        "Idxs",
+        "protoc",
+        "protoimpl",
+        "TOMO"
+    ],
+    "cSpell.enableFiletypes": [
+        "!jsonc",
+        "!markdown"
+    ],
+    // format on save
+    "editor.formatOnSave": true,
+    "editor.inlayHints.enabled": "off",
+    // 在文件末尾添加一个空行
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true,
+    // go
+    "go.toolsEnvVars": {
+        "GO111MODULE": "on",
+        "GOPROXY": "goproxy.cn,direct",
+        "GOSUMDB": "off",
+    },
+    "go.testFlags": [
+        "-v",
+        "-count=1",
+        "-timeout=60s"
+    ],
+}
