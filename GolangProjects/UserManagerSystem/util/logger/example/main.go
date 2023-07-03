@@ -13,7 +13,7 @@ func main() {
 		panic(err)
 	}
 
-	for i := 0; i < 10; i++ {
+	for {
 		logger.Debug("%s log", "debug")
 		logger.Info("%s log", "info")
 		logger.Warn("%s log", "warn")
@@ -23,5 +23,5 @@ func main() {
 		time.Sleep(time.Second * 1)
 	}
 
-	defer logger.Close()
+	// defer logger.Close()
 }

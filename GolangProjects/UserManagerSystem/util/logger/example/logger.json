@@ -1,15 +1,13 @@
 {
     "FileWriter": {
-        "On": true,
+        "Enable": true,
         "LogLevel": "DEBUG",
-        "LogPath": "./example.log.info",
-        "RotateLogPath": "./example.log.info.%Y%M%D%H",
-        "ErrorLogPath": "./example.log.error",
-        "RotateErrorLogPath": "./example.log.error.%Y%M%D%H"
+        "LogPath": "logs/example.log.info",
+        "ErrorLogPath": "logs/example.log.error"
     },
     "ConsoleWriter": {
-        "On": true,
+        "Enable": true,
         "LogLevel": "WARN",
-        "Color": true
+        "EnableColor": true
     }
 }

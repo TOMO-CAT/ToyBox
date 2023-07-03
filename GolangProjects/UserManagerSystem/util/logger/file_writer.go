@@ -2,11 +2,12 @@ package logger
 
 import (
 	"bufio"
-	"bytes"
 	"errors"
 	"fmt"
+	"log"
 	"os"
 	"path"
+	"strconv"
 	"time"
 )
 
@@ -17,12 +18,14 @@ var variable2action map[byte]Action
 type FileWriter struct {
 	logLevelFloor   int
 	logLevelCeiling int
-	fileName        string
-	pathFormat      string
-	file            *os.File
-	fileBuffWriter  *bufio.Writer
-	actions         []Action // TODO: 这里可以和 C++ 版本一样, 用一个 YYYYMMDDHH 的 int 型变量来标识是否需要 rotate
-	variables       []interface{}
+
+	fileName       string
+	file           *os.File
+	fileBuffWriter *bufio.Writer
+
+	currentFileSuffix int   // 当前日志文件后缀 `YYYYmmddHH`, 用于日志按小时切割
+	retainHours       int   // 日志保留小时数
+	historyFileSuffix []int // 当前所有历史日志文件后缀 `YYYYmmddHH` 的集合, 用于过期日志删除
 }
 
 func NewFileWriter() *FileWriter {
@@ -30,6 +33,8 @@ func NewFileWriter() *FileWriter {
 }
 
 func (fa *FileWriter) Init() error {
+	now := time.Now()
+	fa.currentFileSuffix = genCurrentFileSuffix(&now)
 	return fa.CrateFile()
 }
 
@@ -45,46 +50,8 @@ func (fa *FileWriter) SetLogLevelCeiling(logLevel int) {
 	fa.logLevelCeiling = logLevel
 }
 
-func (fa *FileWriter) SetPathPattern(pattern string) error {
-	n := 0
-	for _, c := range pattern {
-		if c == '%' {
-			n++
-		}
-	}
-
-	if n == 0 {
-		fa.pathFormat = pattern
-		return nil
-	}
-
-	fa.actions = make([]Action, 0, n)
-	fa.variables = make([]interface{}, n)
-
-	tmp := []byte(pattern)
-	variable := 0
-	for _, c := range tmp {
-		if variable == 1 {
-			act, ok := variable2action[c]
-			if !ok {
-				return errors.New("invalid rotate pattern (" + pattern + ")")
-			}
-			fa.actions = append(fa.actions, act)
-			variable = 0
-			continue
-		}
-		if c == '%' {
-			variable = 1
-		}
-	}
-
-	for i, act := range fa.actions {
-		now := time.Now()
-		fa.variables[i] = act(&now)
-	}
-
-	fa.pathFormat = convertPatternToFmt(tmp)
-	return nil
+func (fa *FileWriter) SetRetainHours(retainHours int) {
+	fa.retainHours = retainHours
 }
 
 func (fa *FileWriter) Write(r *Record) error {
@@ -104,6 +71,7 @@ func (fa *FileWriter) Write(r *Record) error {
 }
 
 func (fa *FileWriter) CrateFile() error {
+	log.Println("create log file: ", fa.fileName)
 	if err := os.MkdirAll(path.Dir(fa.fileName), 0755); err != nil {
 		if !os.IsExist(err) {
 			return err
@@ -128,21 +96,17 @@ func (fa *FileWriter) Flush() error {
 }
 
 func (fa *FileWriter) Rotate() error {
-	now := time.Now()
-	var v int
-	rotate := false
-	originalVariable := make([]interface{}, len(fa.variables))
-	copy(originalVariable, fa.variables)
+	var (
+		now      = time.Now()
+		isRotate = false
+	)
 
-	for i, act := range fa.actions {
-		v = act(&now)
-		if v != fa.variables[i] {
-			fa.variables[i] = v
-			rotate = true
-		}
+	// 进入新的小时, 准备日期切割
+	if genCurrentFileSuffix(&now) != fa.currentFileSuffix {
+		isRotate = true
 	}
 
-	if !rotate {
+	if !isRotate {
 		return nil
 	}
 
@@ -153,53 +117,47 @@ func (fa *FileWriter) Rotate() error {
 	}
 
 	if fa.file != nil {
-		oldFileName := fmt.Sprintf(fa.pathFormat, originalVariable...)
+		oldFileName := fa.genLogFileName(fa.currentFileSuffix)
 		if err := os.Rename(fa.fileName, oldFileName); err != nil {
 			return err
 		}
+		fa.historyFileSuffix = append(fa.historyFileSuffix, fa.currentFileSuffix)
+		fa.currentFileSuffix = genCurrentFileSuffix(&now)
 	}
 
 	if err := fa.file.Close(); err != nil {
 		return err
 	}
 
-	return fa.CrateFile()
+	if err := fa.CrateFile(); err != nil {
+		return err
+	}
+
+	// 如果历史日志文件个数超过 RetainHours, 那么清理过期日志
+	if len(fa.historyFileSuffix) > fa.retainHours {
+		overdueFileName := fa.genLogFileName(fa.historyFileSuffix[0])
+		log.Println("delete file: ", overdueFileName)
+		if err := os.Remove(overdueFileName); err != nil {
+			return err
+		}
+		fa.historyFileSuffix = fa.historyFileSuffix[1:]
+	}
+
+	return nil
 }
 
-func convertPatternToFmt(pattern []byte) string {
-	pattern = bytes.Replace(pattern, []byte("%Y"), []byte("%d"), -1)
-	pattern = bytes.Replace(pattern, []byte("%M"), []byte("%02d"), -1)
-	pattern = bytes.Replace(pattern, []byte("%D"), []byte("%02d"), -1)
-	pattern = bytes.Replace(pattern, []byte("%H"), []byte("%02d"), -1)
-	pattern = bytes.Replace(pattern, []byte("%m"), []byte("%02d"), -1)
-	return string(pattern)
+func (fa *FileWriter) genLogFileName(hourSuffix int) string {
+	return fmt.Sprintf("%s.%d", fa.fileName, hourSuffix)
 }
 
-func getYear(now *time.Time) int {
-	return now.Year()
-}
-
-func getMonth(now *time.Time) int {
-	return int(now.Month())
-}
-
-func getDay(now *time.Time) int {
-	return now.Hour()
-}
-
-func getHour(now *time.Time) int {
-	return now.Hour()
-}
-
-func getMinute(now *time.Time) int {
-	return now.Minute()
+func genCurrentFileSuffix(t *time.Time) int {
+	suffixStr := t.Format("2006010215")
+	suffixInt, err := strconv.ParseInt(suffixStr, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+	return int(suffixInt)
 }
 
 func init() {
-	variable2action = make(map[byte]Action, 5)
-	variable2action['Y'] = getYear
-	variable2action['M'] = getMonth
-	variable2action['D'] = getDay
-	variable2action['H'] = getHour
-	variable2action['m'] = getMinute
 }
