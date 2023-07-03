@@ -1,0 +1,14 @@
+{
+    "fileWriterConfig": {
+        "enable": true,
+        "logLevel": "LOG_LEVEL_DEBUG",
+        "infoLogPath": "./logs/ums.info",
+        "wfLogPath": "./logs/ums.wf",
+        "retainHours": 48
+    },
+    "consoleWriterConfig": {
+        "enable": true,
+        "logLevel": "LOG_LEVEL_INFO",
+        "enableColor": true
+    }
+}
