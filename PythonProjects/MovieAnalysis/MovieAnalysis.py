@@ -9,6 +9,7 @@ import pandas as pd
 from pandas import DataFrame
 import re
 from pyecharts.charts import Line, Geo, Bar, Pie, Page, ThemeRiver
+import pyecharts.options as opts
 from snownlp import SnowNLP
 import jieba
 from jieba import analyse
@@ -30,13 +31,26 @@ class MovieAnalysis():
         dta = dta.rename(columns={'电影名': 'movie_name', '用户昵称': 'user_name',
                          '评论内容': 'content', '评论日期': 'date', '点赞数': 'votes', '星级数': 'score'})
         # 去掉缺失值
-        dta = dta[['score', 'date']].dropna()
+        # dta = dta[['score', 'date']].dropna()
+
+        print("------------------- delete NaN row -------------------")
+        # 打印包含 NaN 值的列
+        # print(dta.loc[:, dta.isna().any()])
+        # 打印包含 NaN 值的行
+        print(dta[dta.isna().any(axis=1)])
+
+        # 删除包含 NaN 值的行
+        dta = dta.dropna()
+        print("------------------------------------------------------")
 
         return dta
 
     # 电影评分时间走势图
     def draw_content_pic(self, movie):
         dta = self.movie_info(movie)
+
+        # 只取 score 和 date 两列
+        dta = dta[['score', 'date']]
 
         # 初始化score_list数组存放由数据框转换后的列表
         score_list = []
@@ -48,7 +62,7 @@ class MovieAnalysis():
         for idx in dta.index:
             score_list.append(tuple(dta.loc[idx].values[:]))
 
-        # print("有效评分总数量为：",len(score_list), " 条")
+        print("有效评分总数量为：",len(score_list), " 条")
         for i in set(list(score_list)):
             result[i] = score_list.count(i)  # dict类型 ('很差', '2018-04-28'): 55
 
@@ -62,6 +76,8 @@ class MovieAnalysis():
         info_new = DataFrame(info)
         info_new.columns = ['score', 'date', 'votes']
         info_new['date'] = pd.to_datetime(info_new['date'], format='%Y/%m/%d')
+
+
         # 按日期升序排列df，便于找最早date和最晚data，方便后面插值
         info_new.sort_values('date', inplace=True)
 
@@ -116,34 +132,48 @@ class MovieAnalysis():
         attr = list(sorted(set(info_new['date'])))
         for i in attr:
             v1.append(
-                int(info_new[(info_new['date'] == i) & (info_new['score'] == 50)]['votes']))
+                int(info_new[(info_new['date'] == i) & (info_new['score'] == 50)]['votes'].iloc[0]))
             v2.append(
-                int(info_new[(info_new['date'] == i) & (info_new['score'] == 40)]['votes']))
+                int(info_new[(info_new['date'] == i) & (info_new['score'] == 40)]['votes'].iloc[0]))
             v3.append(
-                int(info_new[(info_new['date'] == i) & (info_new['score'] == 30)]['votes']))
+                int(info_new[(info_new['date'] == i) & (info_new['score'] == 30)]['votes'].iloc[0]))
             v4.append(
-                int(info_new[(info_new['date'] == i) & (info_new['score'] == 20)]['votes']))
+                int(info_new[(info_new['date'] == i) & (info_new['score'] == 20)]['votes'].iloc[0]))
             v5.append(
-                int(info_new[(info_new['date'] == i) & (info_new['score'] == 10)]['votes']))
-        # pyecharts绘图
+                int(info_new[(info_new['date'] == i) & (info_new['score'] == 10)]['votes'].iloc[0]))
+        # pyecharts 绘图
         # line = Line("影评走势图")
         line = Line()
-        line.add("五星", attr, v1, is_stack=True)
-        line.add("四星", attr, v2, is_stack=True)
-        line.add("三星", attr, v3, is_stack=True)
-        line.add("二星", attr, v4, is_stack=True)
-        line.add("一星", attr, v5, is_stack=True, is_convert=False,
-                 mark_line=["average"], is_more_utils=True)
+        line.add_xaxis(attr)
+        line.add_yaxis("五星", v1)
+        line.add_yaxis("四星", v2)
+        line.add_yaxis("三星", v3)
+        line.add_yaxis("二星", v4)
+        line.add_yaxis("一星", v5)
+        line.set_global_opts(title_opts=opts.TitleOpts(title='影评走势图'))
+
+        # pyecharts 老版本 api
+        # line.add("五星", attr, v1, is_stack=True)
+        # line.add("四星", attr, v2, is_stack=True)
+        # line.add("三星", attr, v3, is_stack=True)
+        # line.add("二星", attr, v4, is_stack=True)
+        # line.add("一星", attr, v5, is_stack=True, is_convert=False,
+        #          mark_line=["average"], is_more_utils=True)
         line.render("影评走势图.html")
 
     # 绘制情感分析曲线图
-    def count_sentiment(csv_file):
-        csv_file = csv_file + ".csv"
-        # csv_file = csv_file.replace('\\', '\\\\')
-        # 注意csv默认不保存utf-8，需要自己用记事本打开更改编码为utf-8
-        d = pd.read_csv(csv_file, encoding='utf-8')
+    def count_sentiment(self, movie):
+        # csv_file = csv_file + ".csv"
+        # # csv_file = csv_file.replace('\\', '\\\\')
+        # # 注意csv默认不保存utf-8，需要自己用记事本打开更改编码为utf-8
+        # d = pd.read_csv(csv_file, encoding='utf-8')
+        dta = self.movie_info(movie)
+
+        # print(dta.head())
+        # exit(0)
+
         motion_list = []  # 构造空列表，相当于向量
-        for i in d['content']:
+        for i in dta['content']:
             try:
                 # 文本过长时提取关键词后得分比较准确，而且SnowNLP这主要由于此SnowNLP主要用贝叶斯机器学习方法进行训练文本，机器学习在语料覆盖上不够，特征上工程处理不当会减分，也没考虑语义等
                 s = round(
@@ -157,11 +187,11 @@ class MovieAnalysis():
             result[i] = motion_list.count(i)
         return result
 
-    def draw_sentiment_pic(self, csv_file1, csv_file2):
+    def draw_sentiment_pic(self, movie1, movie2):
         attr1, val1 = [], []
         attr2, val2 = [], []
-        info1 = count_sentiment(csv_file1)
-        info2 = count_sentiment(csv_file2)
+        info1 = self.count_sentiment(movie1)
+        info2 = self.count_sentiment(movie2)
         # 字典的items()返回可遍历的(键, 值) 元组数组。
         # dict按照键值排序方法
         info1 = sorted(info1.items(), key=lambda x: x[0], reverse=False)
@@ -173,13 +203,20 @@ class MovieAnalysis():
         for each in info2[:-1]:
             attr2.append(each[0])
             val2.append(each[1])
-        line = Line("豆瓣影评情感分析图")
+        # line = Line("豆瓣影评情感分析图")
+        line = Line()
         # line.add("", attr, val, is_smooth=True, is_more_utils=True)
-        line.add("红海行动", attr1, val1, is_fill=True,
-                 line_opacity=0.2, area_opacity=0.4, symbol=None)
-        line.add("我不是药神", attr2, val2, is_fill=True,
-                 area_color='#000', area_opacity=0.3, is_smooth=True)
-        line.show_config()
+        line.add_xaxis(attr1)
+        line.add_yaxis("红海行动", val1)
+        line.add_xaxis(attr2)
+        line.add_yaxis("我不是药神", val2)
+
+        # line.add("红海行动", attr1, val1, is_fill=True,
+        #          line_opacity=0.2, area_opacity=0.4, symbol=None)
+        # line.add("我不是药神", attr2, val2, is_fill=True,
+        #          area_color='#000', area_opacity=0.3, is_smooth=True)
+        # line.show_config()
+        line.set_global_opts(title_opts=opts.TitleOpts(title='豆瓣影评情感分析图'))
         line.render("豆瓣影评情感分析图.html")
     # 调用函数：draw_sentiment_pic('honghai','yaoshen')  #情感分析图
 
@@ -236,3 +273,4 @@ if __name__ == '__main__':
     movie_list = ['yaoshen', 'honghai']
     for movie in movie_list:
         movie_analyer.draw_content_pic(movie)
+    movie_analyer.draw_sentiment_pic('yaoshen', 'honghai')
