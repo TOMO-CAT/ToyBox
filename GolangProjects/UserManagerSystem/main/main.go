@@ -33,17 +33,32 @@ func main() {
 		},
 	}
 
-	// fmt.Println(msg.String())
+	// // fmt.Println(msg.String())
 
-	// marshalText, _ := proto.Marshal(&msg)
+	str, _ := protojson.Marshal(&msg)
+	fmt.Println(string(str))
 	// fmt.Println(string(marshalText))
 
-	marshalText := protojson.Format(&msg)
-	fmt.Println(marshalText)
-	bs, _ := protojson.Marshal(&msg)
-	fmt.Println(string(bs))
+	// marshalText := protojson.Format(&msg)
+	// fmt.Println(marshalText)
+	// bs, _ := protojson.Marshal(&msg)
+	// fmt.Println(string(bs))
 
-	var data config.LoggerConfig
-	protojson.Unmarshal(bs, &data)
-	fmt.Println(data.String())
+	// var data config.LoggerConfig
+	// protojson.Unmarshal(bs, &data)
+	// fmt.Println(data.String())
+
+	// msg := config.LoggerConfig{}
+	// fmt.Println(protojson.Marshal(&msg))
+
+	// var msg config.LoggerConfig = config.LoggerConfig{
+	// 	FileWriterConfig:    &config.LoggerConfig_FileWriterConfig{},
+	// 	ConsoleWriterConfig: &config.LoggerConfig_ConsoleWriterConfig{},
+	// }
+	// fmt.Println(msg.FileWriterConfig.GetInfoLogPath())
+	// // msgData := "{}"
+	// // protojson.Unmarshal([]byte(msgData), &msg)
+
+	// // fmt.Println(msg.String())
+	// fmt.Println(protojson.Format(&msg))
 }

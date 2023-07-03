@@ -15,7 +15,7 @@ import (
 
 var (
 	logLevel2String = [...]string{"DEBUG", "INFO ", "WARN ", "ERROR", "FATAL"}
-	string2logLevel = map[string]int{"DEBUG": LogLevelDebug, "INFO": LogLevelInfo, "WARN": LogLevelWarn, "ERROR": LogLevelError, "FATAL": LogLevelFatal}
+	string2logLevel = map[string]int{"LOG_LEVEL_DEBUG": LogLevelDebug, "LOG_LEVEL_INFO": LogLevelInfo, "LOG_LEVEL_WARNING": LogLevelWarn, "LOG_LEVEL_ERROR": LogLevelError, "LOG_LEVEL_FATAL": LogLevelFatal}
 	recordPool      *sync.Pool
 )
 

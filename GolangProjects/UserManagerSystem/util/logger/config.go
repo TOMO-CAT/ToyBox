@@ -1,79 +1,70 @@
 package logger
 
 import (
-	"encoding/json"
 	"errors"
 	"io/ioutil"
+
+	"github.com/TOMO-CAT/ToyBox/GolangProjects/UserManagerSystem/proto/config"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
-// 输出到日志文件的配置
-type FileWriterConf struct {
-	Enable       bool   `json:"Enable"`       // 是否将日志写入文件
-	LogLevel     string `json:"LogLevel"`     // 日志级别, 只写入 >= LogLevel 的日志
-	LogPath      string `json:"LogPath"`      // 日志存放文件名
-	ErrorLogPath string `json:"ErrorLogPath"` // Warning 以上日志存放文件名
-}
-
-// 输出到控制台的配置
-type ConsoleWriterConf struct {
-	Enable      bool   `json:"Enable"`      // 是否将日志输出到控制台
-	LogLevel    string `json:"LogLevel"`    // 日志级别, 只写入 >= LogLevel 的日志
-	EnableColor bool   `json:"EnableColor"` // 终端输出是否彩色
-}
-
-type LoggerConf struct {
-	FileWriter    FileWriterConf    `json:"FileWriter"`
-	ConsoleWriter ConsoleWriterConf `json:"ConsoleWriter"`
-}
-
-// InitLoggerWithConf 根据配置文件初始化日志
-func InitLoggerWithConf(confFile string) (err error) {
-	var conf LoggerConf
-
-	// 1. 从文件中读取配置
+// InitLogger 根据配置文件初始化日志模块
+func InitLogger(loggerConfPath string) (err error) {
 	var confContent []byte
-	if confContent, err = ioutil.ReadFile(confFile); err != nil {
-		return err
+	if confContent, err = ioutil.ReadFile(loggerConfPath); err != nil {
+		panic(err)
 	}
 
-	if err = json.Unmarshal(confContent, &conf); err != nil {
-		return err
+	var confPbMsg config.LoggerConfig
+	if err = protojson.Unmarshal(confContent, &confPbMsg); err != nil {
+		panic(err)
+	}
+	return initLoggerWithConf(&confPbMsg)
+}
+
+// InitLoggerDefault 使用默认配置初始化日志模块
+func InitLoggerDefault() (err error) {
+	confPbMsg := config.LoggerConfig{
+		FileWriterConfig:    &config.LoggerConfig_FileWriterConfig{},
+		ConsoleWriterConfig: &config.LoggerConfig_ConsoleWriterConfig{},
 	}
 
-	// 2. 解析配置
-	if conf.FileWriter.Enable {
-		// 2.1 INFO 日志
-		if len(conf.FileWriter.LogPath) > 0 {
+	return initLoggerWithConf(&confPbMsg)
+}
+
+func initLoggerWithConf(conf *config.LoggerConfig) (err error) {
+	if conf.FileWriterConfig != nil {
+		// INFO 日志
+		if len(conf.FileWriterConfig.GetInfoLogPath()) > 0 {
 			w := NewFileWriter()
-			w.SetFileName(conf.FileWriter.LogPath)
-			// w.SetPathPattern(conf.FileWriter.RotateLogPath)
+			w.SetFileName(conf.FileWriterConfig.GetInfoLogPath())
 			w.SetLogLevelFloor(LogLevelDebug)
-			if len(conf.FileWriter.ErrorLogPath) > 0 {
+			if len(conf.FileWriterConfig.GetWfLogPath()) > 0 {
 				w.SetLogLevelCeiling(LogLevelInfo)
 			} else {
 				w.SetLogLevelCeiling(LogLevelFatal)
 			}
-			w.SetRetainHours(5)
+			w.SetRetainHours(int(conf.FileWriterConfig.GetRetainHours()))
 			Register(w)
 		}
 
-		// 2.2 WF 日志
-		if len(conf.FileWriter.ErrorLogPath) > 0 {
+		// WF 日志
+		if len(conf.FileWriterConfig.GetWfLogPath()) > 0 {
 			w := NewFileWriter()
-			w.SetFileName(conf.FileWriter.ErrorLogPath)
-			// w.SetPathPattern(conf.FileWriter.RotateErrorLogPath)
+			w.SetFileName(conf.FileWriterConfig.GetWfLogPath())
 			w.SetLogLevelFloor(LogLevelWarn)
 			w.SetLogLevelCeiling(LogLevelFatal)
-			w.SetRetainHours(10)
+			w.SetRetainHours(int(conf.FileWriterConfig.GetRetainHours()))
 			Register(w)
 		}
 	}
 
-	if conf.ConsoleWriter.Enable {
+	// 控制台日志
+	if conf.ConsoleWriterConfig.GetEnable() {
 		w := NewConsoleWriter()
-		w.SetColor(conf.ConsoleWriter.EnableColor)
-		if consoleLogLevel, ok := string2logLevel[conf.ConsoleWriter.LogLevel]; !ok {
-			err = errors.New("invalid log level: " + conf.ConsoleWriter.LogLevel)
+		w.SetColor(conf.ConsoleWriterConfig.GetEnableColor())
+		if consoleLogLevel, ok := string2logLevel[conf.ConsoleWriterConfig.GetLogLevel().String()]; !ok {
+			err = errors.New("invalid log level: " + conf.ConsoleWriterConfig.GetLogLevel().String())
 			return
 		} else {
 			w.SetLevel(consoleLogLevel)
@@ -81,8 +72,8 @@ func InitLoggerWithConf(confFile string) (err error) {
 		Register(w)
 	}
 
-	if fileLogLevel, ok := string2logLevel[conf.FileWriter.LogLevel]; !ok {
-		err = errors.New("invalid log level: " + conf.FileWriter.LogLevel)
+	if fileLogLevel, ok := string2logLevel[conf.FileWriterConfig.GetLogLevel().String()]; !ok {
+		err = errors.New("invalid log level: " + conf.FileWriterConfig.GetLogLevel().String())
 		return
 	} else {
 		SetLevel(fileLogLevel)

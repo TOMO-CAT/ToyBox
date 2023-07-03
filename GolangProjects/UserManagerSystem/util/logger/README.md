@@ -2,9 +2,7 @@
 
 ## 功能
 
-异步日志库，参考自：
-
-> <https://github.com/shengkehua/xlog4go>
+异步日志库，包含如下特性：
 
 1. 输出到日志文件或控制台
 2. 按小时切割日志
@@ -12,3 +10,7 @@
 4. 支持删除过期日志, 避免打满服务器磁盘
 
 ## 用法
+
+## Reference
+
+[1] <https://github.com/shengkehua/xlog4go>

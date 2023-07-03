@@ -1,13 +1,14 @@
 {
-    "FileWriter": {
-        "Enable": true,
-        "LogLevel": "DEBUG",
-        "LogPath": "logs/example.log.info",
-        "ErrorLogPath": "logs/example.log.wf"
+    "fileWriterConfig": {
+        "enable": true,
+        "logLevel": "LOG_LEVEL_DEBUG",
+        "infoLogPath": "./logs/example.info",
+        "wfLogPath": "./logs/example.wf",
+        "retainHours": 48
     },
-    "ConsoleWriter": {
-        "Enable": true,
-        "LogLevel": "WARN",
-        "EnableColor": true
+    "consoleWriterConfig": {
+        "enable": true,
+        "logLevel": "LOG_LEVEL_INFO",
+        "enableColor": true
     }
 }
