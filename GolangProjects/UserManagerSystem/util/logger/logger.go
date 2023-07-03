@@ -3,8 +3,10 @@ package logger
 import (
 	"fmt"
 	"log"
+	"os"
 	"path"
 	"runtime"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
@@ -12,7 +14,7 @@ import (
 )
 
 var (
-	logLevel2String = [...]string{"DEBUG", "INFO", "WARN", "ERROR", "FATAL"}
+	logLevel2String = [...]string{"DEBUG", "INFO ", "WARN ", "ERROR", "FATAL"}
 	string2logLevel = map[string]int{"DEBUG": LogLevelDebug, "INFO": LogLevelInfo, "WARN": LogLevelWarn, "ERROR": LogLevelError, "FATAL": LogLevelFatal}
 	recordPool      *sync.Pool
 )
@@ -44,7 +46,6 @@ type Writer interface {
 
 type Rotater interface {
 	Rotate() error
-	SetPathPattern(string) error
 }
 
 type Flusher interface {
@@ -57,7 +58,6 @@ type Logger struct {
 	level      int
 	c          chan bool
 	layout     string
-	// levelFunc  func(int) int
 }
 
 var (
@@ -223,7 +223,18 @@ func Error(fmt string, args ...interface{}) {
 }
 
 func Fatal(fmt string, args ...interface{}) {
-	defaultLogger.deliverRecord2Writer(LogLevelFatal, fmt, args...)
+	// 构造 Fatal 日志信息, 包含函数调用栈
+	fatalMsg := fmt
+	fatalMsg += "\n----------------------------------------------"
+	fatalMsg += "\nExiting due to FATAL log"
+	fatalMsg += "\n----------------------------------------------"
+	fatalMsg += "\n"
+	fatalMsg += string(debug.Stack())
+	defaultLogger.deliverRecord2Writer(LogLevelFatal, fatalMsg, args...)
+
+	// 输出所有堆积的日志并退出进程
+	Close()
+	os.Exit(1)
 }
 
 func Register(w Writer) {

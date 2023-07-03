@@ -11,10 +11,6 @@ import (
 	"time"
 )
 
-type Action func(*time.Time) int
-
-var variable2action map[byte]Action
-
 type FileWriter struct {
 	logLevelFloor   int
 	logLevelCeiling int
@@ -97,12 +93,15 @@ func (fa *FileWriter) Flush() error {
 
 func (fa *FileWriter) Rotate() error {
 	var (
-		now      = time.Now()
-		isRotate = false
+		now           = time.Now()
+		isRotate      = false
+		curFileSuffix = genCurrentFileSuffix(&now)
 	)
 
 	// 进入新的小时, 准备日期切割
-	if genCurrentFileSuffix(&now) != fa.currentFileSuffix {
+	log.Println("curFileSuffix: ", curFileSuffix)
+	log.Println("currentFileSuffix: ", fa.currentFileSuffix)
+	if curFileSuffix != fa.currentFileSuffix {
 		isRotate = true
 	}
 
@@ -122,7 +121,7 @@ func (fa *FileWriter) Rotate() error {
 			return err
 		}
 		fa.historyFileSuffix = append(fa.historyFileSuffix, fa.currentFileSuffix)
-		fa.currentFileSuffix = genCurrentFileSuffix(&now)
+		fa.currentFileSuffix = curFileSuffix
 	}
 
 	if err := fa.file.Close(); err != nil {

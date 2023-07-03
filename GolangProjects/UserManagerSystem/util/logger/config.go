@@ -73,7 +73,7 @@ func InitLoggerWithConf(confFile string) (err error) {
 		w := NewConsoleWriter()
 		w.SetColor(conf.ConsoleWriter.EnableColor)
 		if consoleLogLevel, ok := string2logLevel[conf.ConsoleWriter.LogLevel]; !ok {
-			err = errors.New("invalid log level: " + conf.FileWriter.LogLevel)
+			err = errors.New("invalid log level: " + conf.ConsoleWriter.LogLevel)
 			return
 		} else {
 			w.SetLevel(consoleLogLevel)

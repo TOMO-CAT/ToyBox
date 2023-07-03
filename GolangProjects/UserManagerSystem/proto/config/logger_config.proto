@@ -25,4 +25,16 @@ message LoggerConfig {
     // 保存小时数, -1 表示不进行日志切割
     optional int32 retain_hours = 5 [default = 48];
   };
+
+  message ConsoleWriterConfig {
+    // 是否将日志输出到控制台
+    optional bool enable = 1 [default = true];
+    // 日志级别, 只写入 >= LogLevel 的日志
+    optional LogLevel log_level = 2 [default = LOG_LEVEL_INFO];
+    // 是否开启彩色输出
+    optional bool enable_color = 3 [default = true];
+  }
+
+  optional FileWriterConfig file_writer_config = 1;
+  optional ConsoleWriterConfig console_writer_config = 2;
 };

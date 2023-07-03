@@ -3,7 +3,7 @@
         "Enable": true,
         "LogLevel": "DEBUG",
         "LogPath": "logs/example.log.info",
-        "ErrorLogPath": "logs/example.log.error"
+        "ErrorLogPath": "logs/example.log.wf"
     },
     "ConsoleWriter": {
         "Enable": true,
