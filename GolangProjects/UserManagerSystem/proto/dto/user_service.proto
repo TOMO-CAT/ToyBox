@@ -1,0 +1,9 @@
+syntax = "proto3";
+
+package ums.dto.proto;
+
+option go_package = "proto/dto";
+
+service UserService {
+  rpc Register() return () {}
+}

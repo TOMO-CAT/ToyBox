@@ -64,6 +64,10 @@ $ protoc-gen-go --version
 protoc-gen-go v1.31.0
 ```
 
+### 2. redis
+
+### 3. MySql
+
 ## 编译
 
 ```bash
