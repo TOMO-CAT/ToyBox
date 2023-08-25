@@ -1,5 +1,11 @@
 # go
 
+## 安装
+
+```bash
+sudo apt install golang-go
+```
+
 ## 设置代理
 
 > <https://goproxy.io/zh/>

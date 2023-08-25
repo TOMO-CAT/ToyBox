@@ -143,12 +143,12 @@ function docker_build() {
     # 可以使用 --user $(id -u) 代替
     #
     docker run ${general_param} \
-        -v /etc/passwd:/etc/passwd:ro \
-        -v /etc/shadow:/etc/shadow:ro \
-        -v /etc/group:/etc/group:ro \
-        -v /etc/localtime:/etc/localtime:ro \
-        -v /etc/resolv.conf:/etc/resolv.conf:ro \
-        -v ${HOME}/.bashrc:${docker_home}/.bashrc:ro \
+        -v /etc/passwd:/etc/passwd \
+        -v /etc/shadow:/etc/shadow \
+        -v /etc/group:/etc/group \
+        -v /etc/localtime:/etc/localtime \
+        -v /etc/resolv.conf:/etc/resolv.conf \
+        -v ${HOME}/.bashrc:${docker_home}/.bashrc \
         --net host \
         --add-host ${DOCKER_HOSTNAME}:127.0.0.1 \
         --add-host ${local_host}:127.0.0.1 \

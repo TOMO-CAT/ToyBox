@@ -8,7 +8,7 @@ service LoginService {
   // 注册账户
   rpc Register(RegisterRequest) returns (RegisterResponse) {}
   // 登录账户
-  rpc Login() returns () {}
+  // rpc Login() returns () {}
 }
 
 message RegisterRequest {

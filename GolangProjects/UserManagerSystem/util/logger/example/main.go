@@ -18,5 +18,4 @@ func main() {
 	logger.Warn("%s log", "warn")
 	logger.Error("%s log", "error")
 	logger.Fatal("%s log", "fatal")
-
 }
