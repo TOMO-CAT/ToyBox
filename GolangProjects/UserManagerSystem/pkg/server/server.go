@@ -1,0 +1,52 @@
+package main
+
+import (
+	"context"
+	"fmt"
+	"sync"
+	"time"
+
+	"github.com/TOMO-CAT/ToyBox/GolangProjects/UserManagerSystem/pkg/server/httpserver"
+	"github.com/TOMO-CAT/ToyBox/GolangProjects/UserManagerSystem/pkg/util/app"
+	"github.com/TOMO-CAT/ToyBox/GolangProjects/UserManagerSystem/pkg/util/logger"
+)
+
+func main() {
+	umsApp := app.App{
+		Name:    "ums",
+		Usage:   "user managerment system",
+		LogPath: "./logs",
+		RunFunc: run,
+	}
+	umsApp.StartService()
+}
+
+func run(configPath string, ctx context.Context, errChan chan error, appWg *sync.WaitGroup) error {
+	// parse config
+	// if err := config.ParseConfig(configPath); err != nil {
+	// 	logger.Error("init config fail with err:%v", err)
+	// 	return err
+	// }
+
+	// metric && pprof http service
+	httpPort := 3366
+	appWg.Add(1)
+	go func() {
+		defer appWg.Done()
+		logger.Info("start metric && pprof server with port: %d", httpPort)
+		if err := httpserver.Start(ctx, httpPort); err != nil {
+			errChan <- fmt.Errorf("http server closed with err:%v", err)
+		} else {
+			logger.Info("http server shutdown")
+		}
+	}()
+
+	// start grpc server and block here
+	// logger.Info("start grpc server with port: %d", config.GlobalCfg.Port.GrpcPort)
+	// return grpcserver.NewServer().Serve(ctx, config.GlobalCfg.Port.GrpcPort)
+
+	// 这里应该实现一个阻塞操作
+	time.Sleep(60 * time.Minute)
+
+	return nil
+}

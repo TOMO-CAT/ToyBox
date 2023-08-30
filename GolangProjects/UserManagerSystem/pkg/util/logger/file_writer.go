@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"path"
 	"strconv"
@@ -67,7 +66,7 @@ func (fa *FileWriter) Write(r *Record) error {
 }
 
 func (fa *FileWriter) CrateFile() error {
-	log.Println("create log file: ", fa.fileName)
+	// log.Println("create log file: ", fa.fileName)
 	if err := os.MkdirAll(path.Dir(fa.fileName), 0755); err != nil {
 		if !os.IsExist(err) {
 			return err
@@ -99,8 +98,8 @@ func (fa *FileWriter) Rotate() error {
 	)
 
 	// 进入新的小时, 准备日期切割
-	log.Println("curFileSuffix: ", curFileSuffix)
-	log.Println("currentFileSuffix: ", fa.currentFileSuffix)
+	// log.Println("curFileSuffix: ", curFileSuffix)
+	// log.Println("currentFileSuffix: ", fa.currentFileSuffix)
 	if curFileSuffix != fa.currentFileSuffix {
 		isRotate = true
 	}
@@ -135,7 +134,7 @@ func (fa *FileWriter) Rotate() error {
 	// 如果历史日志文件个数超过 RetainHours, 那么清理过期日志
 	if len(fa.historyFileSuffix) > fa.retainHours {
 		overdueFileName := fa.genLogFileName(fa.historyFileSuffix[0])
-		log.Println("delete file: ", overdueFileName)
+		// log.Println("delete file: ", overdueFileName)
 		if err := os.Remove(overdueFileName); err != nil {
 			return err
 		}

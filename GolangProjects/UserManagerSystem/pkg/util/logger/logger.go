@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"path"
 	"runtime"
 	"runtime/debug"
 	"strconv"
@@ -174,7 +173,8 @@ func (l *Logger) deliverRecord2Writer(level int, format string, args ...interfac
 	// source code, file and line number
 	_, file, line, ok := runtime.Caller(2)
 	if ok {
-		codeMessage = path.Base(file) + ":" + strconv.Itoa(line)
+		codeMessage = file + ":" + strconv.Itoa(line)
+		// codeMessage = path.Base(file) + ":" + strconv.Itoa(line)
 	}
 
 	r := recordPool.Get().(*Record)

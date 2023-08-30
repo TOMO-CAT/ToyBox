@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/TOMO-CAT/ToyBox/GolangProjects/UserManagerSystem/util"
-	"github.com/TOMO-CAT/ToyBox/GolangProjects/UserManagerSystem/util/logger"
+	"github.com/TOMO-CAT/ToyBox/GolangProjects/UserManagerSystem/pkg/util"
+	"github.com/TOMO-CAT/ToyBox/GolangProjects/UserManagerSystem/pkg/util/logger"
 )
 
-// 运行: go run util/logger/example/main.go
+// 运行: go run pkg/util/logger/example/main.go
 func main() {
 	if err := logger.InitLogger(util.DirAbsPath() + "/" + "logger.json"); err != nil {
 		panic(err)

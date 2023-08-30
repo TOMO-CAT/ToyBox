@@ -24,3 +24,9 @@ func GetFileINode(fi os.FileInfo) uint64 {
 	fStat := fi.Sys().(*syscall.Stat_t)
 	return fStat.Ino
 }
+
+// IsFileExist 检查文件是否存在
+func IsFileExist(filePath string) bool {
+	_, err := os.Stat(filePath)
+	return !os.IsNotExist(err)
+}

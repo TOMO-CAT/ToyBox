@@ -1,0 +1,100 @@
+syntax = "proto3";
+
+package ums.service.proto;
+
+option go_package = "proto/service";
+
+service UmsService {  
+  // 注册账户
+  rpc Register(RegisterRequest) returns (RegisterResponse) {}
+  // 注销用户
+  // rpc Unregister(UnregisterRequest) returns (UnregisterResponse) {}
+  // 登录账户
+  rpc Login(LoginRequest) returns (LoginResponse) {}
+  // 退出登录
+  rpc Logout(LogoutRequest) returns (LogoutResponse) {}
+
+  // 获取用户信息
+  rpc GetUserInfo (GetUserInfoRequest) returns (GetUserInfoResponse);
+  // 更新用户信息
+  rpc UpdateUserInfo (UpdateUserInfoRequest) returns (UpdateUserInfoResponse);
+}
+
+message RegisterRequest {
+  string user_name = 1;
+  string user_password = 2;
+}
+
+message RegisterResponse {
+  bool is_success = 1;
+  int32 error_code = 2;
+  string error_msg = 3;
+
+  uint64 user_id = 4;
+  string session_id = 5;
+}
+
+message LoginRequest {
+  string user_name = 1;
+  string user_password = 2;
+}
+
+message LoginResponse {
+  bool is_success = 1;
+  int32 error_code = 2;
+  string error_msg = 3;
+
+  uint64 user_id = 4;
+  string session_id = 5;
+}
+
+message LogoutRequest {
+  uint64 user_id = 1;
+  string sessin_id = 2;
+}
+
+message LogoutResponse {
+  bool is_success = 1;
+  int32 error_code = 2;
+  string error_msg = 3;
+}
+
+
+message GetUserInfoRequest {
+  uint64 user_id = 1;
+  string sessin_id = 2;
+}
+
+message UserInfo {
+  uint64 user_id = 1;
+  string user_name = 2;
+  string nickname = 3;
+  string avatar = 4; // 头像
+  string user_signature = 5; // 个性签名
+}
+
+message GetUserInfoResponse {
+  bool is_success = 1;
+  int32 error_code = 2;
+  string error_msg = 3;
+
+  UserInfo user_info = 4;
+}
+
+message UpdateUserInfoRequest {
+  uint64 user_id = 1;
+  string sessin_id = 2;
+
+  // 通过掩码设置需要更新的字段, 每个字段用一个二进制位表示
+  // 0x01 - 0b00001: 非法, 不允许设置 user_id
+  // 0x02 - 0b00010: 设置 user_name
+  // 0x06 - 0b00110: 设置 user_name 和 avatar
+  uint32 bitmask = 3;
+  UserInfo user_info = 4;
+}
+
+message UpdateUserInfoResponse {
+  bool is_success = 1;
+  int32 error_code = 2;
+  string error_msg = 3;
+}

@@ -33,3 +33,10 @@ export GOPROXY=https://proxy.golang.com.cn,direct
 ```bash
 go mod init github.com/TOMO-CAT/ToyBox/GolangProjects/UserManagerSystem
 ```
+
+## 下载依赖
+
+```bash
+go mod tidy
+go mod vendor
+```
