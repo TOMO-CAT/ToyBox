@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"runtime/debug"
 	"sort"
 	"strings"
@@ -30,17 +29,6 @@ type App struct {
 }
 
 var commonFlags = []cli.Flag{
-	// &cli.StringFlag{
-	// 	Name:    "config",
-	// 	Aliases: []string{"c"},
-	// 	Usage:   "config file path",
-	// 	Value:   "conf/config.toml",
-	// },
-	// &cli.StringFlag{
-	// 	Name:  "log-conf",
-	// 	Usage: "log config file path",
-	// 	Value: "conf/logger.json",
-	// },
 	&cli.BoolFlag{
 		Name:    "help",
 		Aliases: []string{"h"},
@@ -102,34 +90,6 @@ func (a *App) runFuncWrapper() cli.ActionFunc {
 			printBuildInfo()
 			return nil
 		}
-
-		// 初始化日志
-		if loggerConfAbsPath, err := filepath.Abs(c.String("log-conf")); err != nil {
-			fmt.Printf("invalid logger conf [%s]\n", c.String("log-conf"))
-			return fmt.Errorf("invalid logger conf [%s]", c.String("log-conf"))
-		} else if !util.IsFileExist(loggerConfAbsPath) {
-			fmt.Printf("logger conf [%s] don't exist\n", loggerConfAbsPath)
-			return fmt.Errorf("logger conf [%s] don't exist", loggerConfAbsPath)
-		} else {
-			if err = logger.InitLogger(loggerConfAbsPath); err != nil {
-				fmt.Printf("init logger fail with error [%s]\n", err)
-				return fmt.Errorf("init logger fail with error [%s]", err)
-			}
-		}
-		// 保证可以打印所有的异步日志
-		defer func() {
-			logger.Close()
-		}()
-
-		// // 检查配置文件是否存在
-		// if confAbsPath, err := filepath.Abs(c.String("config")); err != nil {
-
-		// }
-
-		// if !util.IsFileExist(c.String("config")) {
-		// 	logger.Error("invalid config path||path=%s", c.String("config"))
-		// 	return cli.ShowAppHelp(c)
-		// }
 
 		pidFileDir := c.String("pid-dir")
 		if strings.TrimSpace(pidFileDir) == "" {

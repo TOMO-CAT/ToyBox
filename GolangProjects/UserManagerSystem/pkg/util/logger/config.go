@@ -2,7 +2,9 @@ package logger
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
+	"os"
 
 	"github.com/TOMO-CAT/ToyBox/GolangProjects/UserManagerSystem/proto/config"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -10,6 +12,11 @@ import (
 
 // InitLogger 根据配置文件初始化日志模块
 func InitLogger(loggerConfPath string) (err error) {
+
+	if !isFileExist(loggerConfPath) {
+		return fmt.Errorf("logger conf [%s] don't exist", loggerConfPath)
+	}
+
 	var confContent []byte
 	if confContent, err = ioutil.ReadFile(loggerConfPath); err != nil {
 		panic(err)
@@ -80,4 +87,9 @@ func initLoggerWithConf(conf *config.LoggerConfig) (err error) {
 	}
 
 	return
+}
+
+func isFileExist(filePath string) bool {
+	_, err := os.Stat(filePath)
+	return !os.IsNotExist(err)
 }

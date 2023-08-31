@@ -12,6 +12,10 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
+const (
+	kDefaultLoggerPath = "conf/logger.json"
+)
+
 func main() {
 	umsApp := app.App{
 		Name:    "ums",
@@ -39,6 +43,19 @@ func run(flags map[string]interface{}, ctx context.Context, errChan chan error, 
 	// }
 
 	// 初始化日志
+	var loggerConfPath string = kDefaultLoggerPath
+	if val, exists := flags["log-conf"]; exists {
+		loggerConfPath = fmt.Sprintf("%v", val)
+	}
+	if err := logger.InitLogger(loggerConfPath); err != nil {
+		fmt.Printf("init logger [%s] fail with err [%v]\n", loggerConfPath, err)
+		return fmt.Errorf("init logger [%s] fail with err [%v]", loggerConfPath, err)
+	}
+
+	// 保证可以打印所有的异步日志
+	defer func() {
+		logger.Close()
+	}()
 
 	// metric && pprof http service
 	httpPort := 3366
