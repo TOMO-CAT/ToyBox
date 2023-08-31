@@ -9,24 +9,36 @@ import (
 	"github.com/TOMO-CAT/ToyBox/GolangProjects/UserManagerSystem/pkg/server/httpserver"
 	"github.com/TOMO-CAT/ToyBox/GolangProjects/UserManagerSystem/pkg/util/app"
 	"github.com/TOMO-CAT/ToyBox/GolangProjects/UserManagerSystem/pkg/util/logger"
+	"github.com/urfave/cli/v2"
 )
 
 func main() {
 	umsApp := app.App{
 		Name:    "ums",
 		Usage:   "user managerment system",
-		LogPath: "./logs",
 		RunFunc: run,
 	}
-	umsApp.StartService()
+	umsApp.StartService(
+		&cli.StringFlag{
+			Name:  "conf",
+			Usage: "config file path",
+			Value: "conf/config.toml",
+		}, &cli.StringFlag{
+			Name:  "log-conf",
+			Usage: "log config file path",
+			Value: "conf/logger.json",
+		},
+	)
 }
 
-func run(configPath string, ctx context.Context, errChan chan error, appWg *sync.WaitGroup) error {
+func run(flags map[string]interface{}, ctx context.Context, errChan chan error, appWg *sync.WaitGroup) error {
 	// parse config
 	// if err := config.ParseConfig(configPath); err != nil {
 	// 	logger.Error("init config fail with err:%v", err)
 	// 	return err
 	// }
+
+	// 初始化日志
 
 	// metric && pprof http service
 	httpPort := 3366

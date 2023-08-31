@@ -21,9 +21,8 @@ import (
 type App struct {
 	Name        string
 	Usage       string
-	LogPath     string
 	PrepareFunc cli.BeforeFunc
-	RunFunc     func(string, context.Context, chan error, *sync.WaitGroup) error
+	RunFunc     func(map[string]interface{}, context.Context, chan error, *sync.WaitGroup) error
 
 	// exit gracefully
 	wg      sync.WaitGroup
@@ -37,11 +36,11 @@ var commonFlags = []cli.Flag{
 	// 	Usage:   "config file path",
 	// 	Value:   "conf/config.toml",
 	// },
-	&cli.StringFlag{
-		Name:  "log-conf",
-		Usage: "log config file path",
-		Value: "conf/logger.json",
-	},
+	// &cli.StringFlag{
+	// 	Name:  "log-conf",
+	// 	Usage: "log config file path",
+	// 	Value: "conf/logger.json",
+	// },
 	&cli.BoolFlag{
 		Name:    "help",
 		Aliases: []string{"h"},
@@ -53,19 +52,13 @@ var commonFlags = []cli.Flag{
 		Usage:   "print build info",
 	},
 	&cli.StringFlag{
-		Name:    "control",
-		Aliases: []string{"c"},
-		Usage:   "send command to control the running service [start | stop | restart]",
+		Name:  "control",
+		Usage: "send command to control the running service [start | stop | restart]",
 	},
 	&cli.StringFlag{
 		Name:  "pid-dir",
 		Usage: "where to put the pid file",
 		Value: ".",
-	},
-	&cli.StringFlag{
-		Name:  "log-prefix",
-		Usage: "log file prefix, default is the service name",
-		Value: "-",
 	},
 }
 
@@ -128,7 +121,11 @@ func (a *App) runFuncWrapper() cli.ActionFunc {
 			logger.Close()
 		}()
 
-		// 初始化配置
+		// // 检查配置文件是否存在
+		// if confAbsPath, err := filepath.Abs(c.String("config")); err != nil {
+
+		// }
+
 		// if !util.IsFileExist(c.String("config")) {
 		// 	logger.Error("invalid config path||path=%s", c.String("config"))
 		// 	return cli.ShowAppHelp(c)
@@ -179,6 +176,11 @@ func (a *App) runFuncWrapper() cli.ActionFunc {
 
 		// 运行主逻辑
 		a.wg.Add(1)
+		// 获取所有的 flag 透传出去给用户 run 方法
+		var flagMap = make(map[string]interface{})
+		for _, name := range c.FlagNames() {
+			flagMap[name] = c.Generic(name)
+		}
 		go func() {
 			defer func() {
 				defer a.wg.Done()
@@ -189,7 +191,7 @@ func (a *App) runFuncWrapper() cli.ActionFunc {
 			}()
 
 			logger.Info("app [%s] start", a.Name)
-			err := a.RunFunc(c.String("config"), ctx, a.errChan, &a.wg)
+			err := a.RunFunc(flagMap, ctx, a.errChan, &a.wg)
 			a.errChan <- err
 			logger.Info("app [%s] quit with err: %v", a.Name, err)
 		}()
@@ -230,9 +232,6 @@ func (a *App) wait(cancel context.CancelFunc) {
 		fmt.Println("force quit!")
 		logger.Error("force quit!")
 	case <-isWgDone:
-		// leave some time for end log (like http quit log)
-		// TODO(cat): 是否可以用 logger.Close() 替换?
-		// time.Sleep(200 * time.Millisecond)
 		return
 	}
 }

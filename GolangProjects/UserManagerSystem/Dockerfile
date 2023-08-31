@@ -11,7 +11,8 @@ RUN sed -i 's/archive.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list \
     protobuf-compiler \
     vim \
     make \
-    sudo
+    sudo \
+    curl
 
 # 设置代理, 解决 go install 的网络问题
 ENV GOPROXY=https://proxy.golang.com.cn,direct
