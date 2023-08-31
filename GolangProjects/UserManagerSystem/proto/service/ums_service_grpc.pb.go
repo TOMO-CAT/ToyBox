@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
+	UmsService_Echo_FullMethodName           = "/ums.service.proto.UmsService/Echo"
 	UmsService_Register_FullMethodName       = "/ums.service.proto.UmsService/Register"
 	UmsService_Login_FullMethodName          = "/ums.service.proto.UmsService/Login"
 	UmsService_Logout_FullMethodName         = "/ums.service.proto.UmsService/Logout"
@@ -30,6 +31,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UmsServiceClient interface {
+	Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoResponse, error)
 	// 注册账户
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error)
 	// 注销用户
@@ -50,6 +52,15 @@ type umsServiceClient struct {
 
 func NewUmsServiceClient(cc grpc.ClientConnInterface) UmsServiceClient {
 	return &umsServiceClient{cc}
+}
+
+func (c *umsServiceClient) Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoResponse, error) {
+	out := new(EchoResponse)
+	err := c.cc.Invoke(ctx, UmsService_Echo_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *umsServiceClient) Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterResponse, error) {
@@ -101,6 +112,7 @@ func (c *umsServiceClient) UpdateUserInfo(ctx context.Context, in *UpdateUserInf
 // All implementations must embed UnimplementedUmsServiceServer
 // for forward compatibility
 type UmsServiceServer interface {
+	Echo(context.Context, *EchoRequest) (*EchoResponse, error)
 	// 注册账户
 	Register(context.Context, *RegisterRequest) (*RegisterResponse, error)
 	// 注销用户
@@ -120,6 +132,9 @@ type UmsServiceServer interface {
 type UnimplementedUmsServiceServer struct {
 }
 
+func (UnimplementedUmsServiceServer) Echo(context.Context, *EchoRequest) (*EchoResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Echo not implemented")
+}
 func (UnimplementedUmsServiceServer) Register(context.Context, *RegisterRequest) (*RegisterResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Register not implemented")
 }
@@ -146,6 +161,24 @@ type UnsafeUmsServiceServer interface {
 
 func RegisterUmsServiceServer(s grpc.ServiceRegistrar, srv UmsServiceServer) {
 	s.RegisterService(&UmsService_ServiceDesc, srv)
+}
+
+func _UmsService_Echo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EchoRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UmsServiceServer).Echo(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UmsService_Echo_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UmsServiceServer).Echo(ctx, req.(*EchoRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _UmsService_Register_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -245,6 +278,10 @@ var UmsService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "ums.service.proto.UmsService",
 	HandlerType: (*UmsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Echo",
+			Handler:    _UmsService_Echo_Handler,
+		},
 		{
 			MethodName: "Register",
 			Handler:    _UmsService_Register_Handler,

@@ -3,6 +3,7 @@ module github.com/TOMO-CAT/ToyBox/GolangProjects/UserManagerSystem
 go 1.18
 
 require (
+	github.com/google/uuid v1.3.0
 	github.com/prometheus/client_golang v1.16.0
 	github.com/urfave/cli/v2 v2.25.7
 	google.golang.org/grpc v1.57.0

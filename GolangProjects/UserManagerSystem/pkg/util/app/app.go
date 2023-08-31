@@ -82,6 +82,9 @@ func (a *App) StartService(customFlags ...cli.Flag) error {
 
 func (a *App) runFuncWrapper() cli.ActionFunc {
 	return func(c *cli.Context) error {
+		// 在程序退出时确保打印出所有的异步日志
+		defer logger.Close()
+
 		if c.Bool("help") {
 			return cli.ShowAppHelp(c)
 		}

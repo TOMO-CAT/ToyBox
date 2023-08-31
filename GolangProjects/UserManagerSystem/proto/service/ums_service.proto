@@ -4,7 +4,9 @@ package ums.service.proto;
 
 option go_package = "proto/service";
 
-service UmsService {  
+service UmsService {
+  rpc Echo(EchoRequest) returns (EchoResponse) {}
+
   // 注册账户
   rpc Register(RegisterRequest) returns (RegisterResponse) {}
   // 注销用户
@@ -18,6 +20,16 @@ service UmsService {
   rpc GetUserInfo (GetUserInfoRequest) returns (GetUserInfoResponse);
   // 更新用户信息
   rpc UpdateUserInfo (UpdateUserInfoRequest) returns (UpdateUserInfoResponse);
+}
+
+message EchoRequest {
+  int64 trace_id = 1;
+  string message = 2;
+}
+
+message EchoResponse {
+  int64 trace_id = 1;
+  string message = 2;
 }
 
 message RegisterRequest {
