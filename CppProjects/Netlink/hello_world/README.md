@@ -1,5 +1,9 @@
 # README
 
+## 功能
+
+基于 Netlink 的内核通信 Hello-World 简单例子。
+
 ## 文件目录
 
 ```bash

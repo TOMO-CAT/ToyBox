@@ -9,4 +9,4 @@ all:
 
 clean:
 	$(MAKE) -C $(KERNELDIR) M=$(PWD) clean
-	rm user_netlink
+	rm -f user_netlink
