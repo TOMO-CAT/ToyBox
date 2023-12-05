@@ -35,10 +35,11 @@
     perror(new_str.c_str());                                                               \
   } while (0)
 
-#define NLINK_MSG_LEN 4096
+#define NLINK_MSG_LEN 16384
 
 int main() {
-  int fd = ::socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
+  // int fd = ::socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
+  int fd = ::socket(AF_NETLINK, SOCK_RAW, NETLINK_USERSOCK);
   printf2console("receiver is ready!");
 
   if (fd < 0) {
