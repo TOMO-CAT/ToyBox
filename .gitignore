@@ -5,3 +5,6 @@ build64_release/
 .cache/
 compile_commands.json
 logs
+receiver
+sender
+.xmake/

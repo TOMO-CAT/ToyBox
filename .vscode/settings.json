@@ -10,17 +10,14 @@
         "iphdr",
         "iterrows",
         "jieba",
+        "NLMSG",
+        "nlmsghdr",
         "pyplot",
         "snownlp",
         "srcs",
         "WLOG",
         "yaosehn",
-        "yaoshen",
-        "cout",
-        "epoll",
-        "iphdr",
-        "srcs",
-        "WLOG"
+        "yaoshen"
     ],
     "cpplint.lineLength": 180, // 设置行长度
     "cpplint.filters": [
