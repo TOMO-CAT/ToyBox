@@ -11,15 +11,28 @@
 
 // 配置消息大小
 // https://stackoverflow.com/questions/43560200/why-max-netlink-msg-size-is-limited-to-16k
-constexpr uint32_t NLINK_MSG_LEN = 16384;  // 16 kb
+// constexpr uint32_t NLINK_MSG_LEN = 16384;  // 16 kb
 // constexpr uint32_t NLINK_MSG_LEN = 1024;  // 1 kb
+constexpr uint32_t NLINK_MSG_LEN = 32;
 // 配置需要接收的消息数量
-constexpr uint32_t kCount = 1000;
+constexpr uint32_t kCount = 100000;
 
 inline uint64_t TimestampNanoSec() {
   struct timespec time;
   ::clock_gettime(CLOCK_REALTIME, &time);
   return time.tv_sec * 1000 * 1000 * 1000 + time.tv_nsec;
+}
+
+std::string ToHexString(const uint8_t* const data, const uint32_t len) {
+  static const char HEX[] = "0123456789ABCDEF";
+  std::string str;
+  str.reserve(len * 3 + 4);
+  const uint8_t* pos = data;
+  for (uint32_t i = 0; i < len; ++i, ++pos) {
+    str += HEX[(*pos) >> 4];
+    str += HEX[(*pos) & 0xf];
+  }
+  return str;
 }
 
 #define printf2console(fmt, args...)                                                           \
@@ -47,8 +60,6 @@ inline uint64_t TimestampNanoSec() {
     std::string new_str = std::string(buff) + str;                                         \
     perror(new_str.c_str());                                                               \
   } while (0)
-
-#define NLINK_MSG_LEN 16384
 
 int main() {
   // https://stackoverflow.com/questions/26238160/is-anyone-using-netlink-for-ipc
@@ -95,7 +106,8 @@ int main() {
   uint32_t last_sequence = 0;
   uint64_t timestamp_ns = 0;
   uint64_t delay_ns = 0;
-  while (1) {
+  uint64_t max_delay_ns = 0;
+  for (uint32_t i = 0; i < kCount; ++i) {
     ssize_t bytes_received = ::recvmsg(fd, &msg, 0);
     if (bytes_received == -1) {
       perror2console("receive message fail");
@@ -107,15 +119,19 @@ int main() {
           (reinterpret_cast<char*>(NLMSG_DATA(nlh)) + sizeof(timestamp_ns)));
       if (sequence != last_sequence + 1) {
         printf2console("out of order!");
+        exit(1);
       }
       last_sequence = sequence;
       timestamp_ns = *reinterpret_cast<uint64_t*>(NLMSG_DATA(nlh));
       delay_ns = TimestampNanoSec() - timestamp_ns;
-      printf2console("receiver [%d] [delay_ns = %ld] [timestamp = %ld] [size = %ld]", sequence,
-                     delay_ns, timestamp_ns, bytes_received);
+      max_delay_ns = std::max(delay_ns, max_delay_ns);
+      printf("[%4d] [%ld] [size=%ld] [delay=%10ld]", sequence, timestamp_ns, bytes_received,
+             delay_ns);
+      printf(" [%s]\n",
+             ToHexString(reinterpret_cast<uint8_t*>(NLMSG_DATA(nlh)), NLINK_MSG_LEN).c_str());
       // printf2console("received message: %s", reinterpret_cast<char*>(NLMSG_DATA(nlh)));
     }
   }
-
+  printf("max delay: [%.3f ms]\n", max_delay_ns / 1000.0 / 1000.0);
   ::close(fd);
 }

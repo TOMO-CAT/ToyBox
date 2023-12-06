@@ -152,4 +152,5 @@
     "python.formatting.provider": "none",
     "python.linting.flake8Enabled": false,
     "python.linting.enabled": true,
+    "terminal.integrated.scrollback": 5000,
 }

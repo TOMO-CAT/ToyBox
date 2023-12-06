@@ -12,14 +12,27 @@
 #include <thread>
 
 // https://stackoverflow.com/questions/43560200/why-max-netlink-msg-size-is-limited-to-16k
-constexpr uint32_t NLINK_MSG_LEN = 16384;  // 16 kb
+// constexpr uint32_t NLINK_MSG_LEN = 16384;  // 16 kb
 // constexpr uint32_t NLINK_MSG_LEN = 1024;  // 1 kb
-constexpr uint32_t kCount = 1000;
+constexpr uint32_t NLINK_MSG_LEN = 32;
+constexpr uint32_t kCount = 100000;
 
 inline uint64_t TimestampNanoSec() {
   struct timespec time;
   ::clock_gettime(CLOCK_REALTIME, &time);
   return time.tv_sec * 1000 * 1000 * 1000 + time.tv_nsec;
+}
+
+std::string ToHexString(const uint8_t* const data, const uint32_t len) {
+  static const char HEX[] = "0123456789ABCDEF";
+  std::string str;
+  str.reserve(len * 3 + 4);
+  const uint8_t* pos = data;
+  for (uint32_t i = 0; i < len; ++i, ++pos) {
+    str += HEX[(*pos) >> 4];
+    str += HEX[(*pos) & 0xf];
+  }
+  return str;
 }
 
 #define printf2console(fmt, args...)                                                           \
@@ -118,7 +131,9 @@ int main() {
   // 将数据拷贝到 nlh 中的 data
   char data_to_send[NLINK_MSG_LEN] = {};
   std::fill_n(data_to_send, NLINK_MSG_LEN, 'x');
-  data_to_send[NLINK_MSG_LEN - 1] = '\0';
+  // data_to_send[NLINK_MSG_LEN - 1] = '\0';
+  printf("date=[%s]\n",
+         ToHexString(reinterpret_cast<uint8_t*>(data_to_send), NLINK_MSG_LEN).c_str());
 
   // std::string content = std::string(NLINK_MSG_LEN, 'x');
   // ::snprintf(reinterpret_cast<char*>(NLMSG_DATA(nlh)), NLINK_MSG_LEN, "%s", content.c_str());
@@ -130,10 +145,10 @@ int main() {
     // 构造即将发送的数据
     // 前 64 位存放时间戳
     timestamp_ns = TimestampNanoSec();
-    sequence++;
+    sequence = sequence + 1;
     std::memcpy(data_to_send, &timestamp_ns, sizeof(timestamp_ns));
     std::memcpy(data_to_send + sizeof(timestamp_ns), &sequence, sizeof(sequence));
-    ::snprintf(reinterpret_cast<char*>(NLMSG_DATA(nlh)), NLINK_MSG_LEN, "%s", data_to_send);
+    std::memcpy(reinterpret_cast<char*>(NLMSG_DATA(nlh)), &data_to_send, NLINK_MSG_LEN);
 
     ssize_t bytes_sent = ::sendmsg(fd, &msg, 0);
 
@@ -148,11 +163,13 @@ int main() {
     } else {
       // printf2console("send message [%s]", reinterpret_cast<char*>(NLMSG_DATA(nlh)));
       // printf2console("send %ld message", bytes_sent);
-      printf2console("data sequence: %u, data timestamp_ns: %ld, data_size: %lu",
-                     *(reinterpret_cast<uint32_t*>(data_to_send + sizeof(timestamp_ns))),
-                     *reinterpret_cast<uint64_t*>(data_to_send), bytes_sent);
+      printf("[%4d] [%ld] [size=%lu]",
+             *(reinterpret_cast<uint32_t*>(data_to_send + sizeof(timestamp_ns))),
+             *reinterpret_cast<uint64_t*>(data_to_send), bytes_sent);
+      printf(" [%s]\n",
+             ToHexString(reinterpret_cast<uint8_t*>(NLMSG_DATA(nlh)), NLINK_MSG_LEN).c_str());
     }
-    // std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(5));
   }
 
   ::close(fd);  // close the socket
