@@ -66,7 +66,9 @@ int main() {
   src_addr.nl_groups = 0;           // specify not a multicast communication
 
   // attach socket to unique id or address
-  ::bind(fd, (struct sockaddr*)&src_addr, sizeof(src_addr));
+  if (::bind(fd, (struct sockaddr*)&src_addr, sizeof(src_addr)) != 0) {
+    perror2console("bind Netlink socket failed!");
+  }
 
   iov.iov_base = reinterpret_cast<void*>(nlh);  // netlink message header base address
   iov.iov_len = nlh->nlmsg_len;                 // netlink message length

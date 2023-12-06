@@ -11,6 +11,14 @@
 #include <string>
 #include <thread>
 
+constexpr uint32_t kCount = 10;
+
+inline uint64_t TimestampNanoSec() {
+  struct timespec time;
+  ::clock_gettime(CLOCK_REALTIME, &time);
+  return time.tv_sec * 1000 * 1000 * 1000 + time.tv_nsec;
+}
+
 #define printf2console(fmt, args...)                                                           \
   do {                                                                                         \
     struct timeval now;                                                                        \
@@ -38,8 +46,8 @@
   } while (0)
 
 // https://stackoverflow.com/questions/43560200/why-max-netlink-msg-size-is-limited-to-16k
-// #define NLINK_MSG_LEN 16384
-uint32_t NLINK_MSG_LEN = 16384;
+// constexpr uint32_t NLINK_MSG_LEN = 16384;  // 16 kb
+constexpr uint32_t NLINK_MSG_LEN = 1024;  // 1 kb
 
 int main() {
   // 创建 netlink socket
@@ -107,14 +115,30 @@ int main() {
   msg.msg_iov = &iov;
   msg.msg_iovlen = 1;
 
-  // 构造即将发送的数据
-  std::string content = std::string(NLINK_MSG_LEN, 'x');
-
   // 将数据拷贝到 nlh 中的 data
+  char data_to_send[NLINK_MSG_LEN] = {};
+  std::fill_n(data_to_send, NLINK_MSG_LEN, 'x');
+  data_to_send[NLINK_MSG_LEN - 1] = '\0';
+
+  std::string content = std::string(NLINK_MSG_LEN, 'x');
   ::snprintf(reinterpret_cast<char*>(NLMSG_DATA(nlh)), NLINK_MSG_LEN, "%s", content.c_str());
 
-  for (int i = 0; i < 10; ++i) {
+  uint64_t timestamp_ns = 0;
+  uint32_t sequence = 0;
+
+  for (uint32_t i = 0; i < kCount; ++i) {
+    // 构造即将发送的数据
+    // 前 64 位存放时间戳
+    timestamp_ns = TimestampNanoSec();
+    sequence++;
+    std::memcpy(data_to_send, &timestamp_ns, sizeof(timestamp_ns));
+    std::memcpy(data_to_send + sizeof(timestamp_ns), &sequence, sizeof(sequence));
+
     ssize_t bytes_sent = ::sendmsg(fd, &msg, 0);
+
+    printf2console("data timestamp_ns: %ld", *(reinterpret_cast<uint64_t*>(data_to_send)));
+    printf2console("data sequence: %u",
+                   *(reinterpret_cast<uint32_t*>(data_to_send + sizeof(timestamp_ns))));
 
     // 检查是否发送成功
     if (bytes_sent == -1) {
