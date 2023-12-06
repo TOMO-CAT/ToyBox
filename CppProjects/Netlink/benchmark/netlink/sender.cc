@@ -11,7 +11,10 @@
 #include <string>
 #include <thread>
 
-constexpr uint32_t kCount = 10;
+// https://stackoverflow.com/questions/43560200/why-max-netlink-msg-size-is-limited-to-16k
+constexpr uint32_t NLINK_MSG_LEN = 16384;  // 16 kb
+// constexpr uint32_t NLINK_MSG_LEN = 1024;  // 1 kb
+constexpr uint32_t kCount = 1000;
 
 inline uint64_t TimestampNanoSec() {
   struct timespec time;
@@ -45,11 +48,8 @@ inline uint64_t TimestampNanoSec() {
     perror(new_str.c_str());                                                               \
   } while (0)
 
-// https://stackoverflow.com/questions/43560200/why-max-netlink-msg-size-is-limited-to-16k
-// constexpr uint32_t NLINK_MSG_LEN = 16384;  // 16 kb
-constexpr uint32_t NLINK_MSG_LEN = 1024;  // 1 kb
-
 int main() {
+  // https://stackoverflow.com/questions/26238160/is-anyone-using-netlink-for-ipc
   // 创建 netlink socket
   // int fd = ::socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
   int fd = ::socket(AF_NETLINK, SOCK_RAW, NETLINK_USERSOCK);
@@ -120,8 +120,8 @@ int main() {
   std::fill_n(data_to_send, NLINK_MSG_LEN, 'x');
   data_to_send[NLINK_MSG_LEN - 1] = '\0';
 
-  std::string content = std::string(NLINK_MSG_LEN, 'x');
-  ::snprintf(reinterpret_cast<char*>(NLMSG_DATA(nlh)), NLINK_MSG_LEN, "%s", content.c_str());
+  // std::string content = std::string(NLINK_MSG_LEN, 'x');
+  // ::snprintf(reinterpret_cast<char*>(NLMSG_DATA(nlh)), NLINK_MSG_LEN, "%s", content.c_str());
 
   uint64_t timestamp_ns = 0;
   uint32_t sequence = 0;
@@ -133,21 +133,26 @@ int main() {
     sequence++;
     std::memcpy(data_to_send, &timestamp_ns, sizeof(timestamp_ns));
     std::memcpy(data_to_send + sizeof(timestamp_ns), &sequence, sizeof(sequence));
+    ::snprintf(reinterpret_cast<char*>(NLMSG_DATA(nlh)), NLINK_MSG_LEN, "%s", data_to_send);
 
     ssize_t bytes_sent = ::sendmsg(fd, &msg, 0);
 
-    printf2console("data timestamp_ns: %ld", *(reinterpret_cast<uint64_t*>(data_to_send)));
-    printf2console("data sequence: %u",
-                   *(reinterpret_cast<uint32_t*>(data_to_send + sizeof(timestamp_ns))));
+    // printf2console("data timestamp_ns: %ld", *(reinterpret_cast<uint64_t*>(data_to_send)));
+    // printf2console("data sequence: %u, data timestamp_ns: %ld, data_size: %u",
+    //                *(reinterpret_cast<uint32_t*>(data_to_send + sizeof(timestamp_ns))),
+    //                *reinterpret_cast<uint64_t*>(data_to_send), bytes_sent);
 
     // 检查是否发送成功
     if (bytes_sent == -1) {
       perror2console("send message fail");
     } else {
       // printf2console("send message [%s]", reinterpret_cast<char*>(NLMSG_DATA(nlh)));
-      printf2console("send %ld message", bytes_sent);
+      // printf2console("send %ld message", bytes_sent);
+      printf2console("data sequence: %u, data timestamp_ns: %ld, data_size: %lu",
+                     *(reinterpret_cast<uint32_t*>(data_to_send + sizeof(timestamp_ns))),
+                     *reinterpret_cast<uint64_t*>(data_to_send), bytes_sent);
     }
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    // std::this_thread::sleep_for(std::chrono::seconds(1));
   }
 
   ::close(fd);  // close the socket
