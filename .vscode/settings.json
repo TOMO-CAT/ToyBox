@@ -17,7 +17,13 @@
         "srcs",
         "WLOG",
         "yaosehn",
-        "yaoshen"
+        "yaoshen",
+        "aiohttp",
+        "aiortc",
+        "coros",
+        "PCMA",
+        "PCMU",
+        "rtpmap"
     ],
     "cpplint.lineLength": 180, // 设置行长度
     "cpplint.filters": [
